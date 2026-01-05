@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dray Official - Linktree</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -19,6 +18,7 @@
             --secondary: #1a1f4b;
             --accent: #6c63ff;
             --accent-light: #8a84ff;
+            --accent-blue: #4d8af0;
             --text: #ffffff;
             --text-secondary: #b0b0d0;
             --neon-glow: 0 0 15px rgba(108, 99, 255, 0.7),
@@ -39,9 +39,9 @@
             overflow-x: hidden;
             position: relative;
             background: radial-gradient(ellipse at center, #0a0e29 0%, #050716 100%);
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Background dengan bintang dan animasi meteor */
         .night-sky {
             position: fixed;
             top: 0;
@@ -70,103 +70,289 @@
         }
 
         .container {
-            max-width: 600px;
+            width: 100%;
+            max-width: 100%;
             margin: 0 auto;
-            padding: 20px;
+            padding: 12px 20px;
             position: relative;
             z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Profil Section */
         .profile-section {
             text-align: center;
-            padding: 8px 0 5px; /* Sangat kecil */
+            padding: 10px 0 5px;
+            flex-shrink: 0;
         }
 
-        /* GAMBAR PROFIL DIKECILKAN BANGET - HANYA INI YANG BERUBAH */
         .profile-image {
-            width: 0px; /* SANGAT KECIL */
-            height: 0px; /* SANGAT KECIL */
+            width: 85px;
+            height: 85px;
             border-radius: 50%;
-            margin: 0 auto 4px; /* Sangat kecil */
+            margin: 0 auto 10px;
             overflow: hidden;
-            border: 1px solid var(--accent); /* Tipis */
+            border: 1px solid var(--accent);
             position: relative;
-            box-shadow: 0 0 3px rgba(108, 99, 255, 0.5); /* Minimal */
+            box-shadow: 0 0 3px rgba(108, 99, 255, 0.5);
             transition: all 0.3s ease;
         }
 
         .profile-image:hover {
-            transform: scale(1.1);
+            transform: scale(1.08);
             box-shadow: 0 0 5px rgba(108, 99, 255, 0.8);
         }
 
         .profile-image img {
-            width: 50%;
-            height: 50%;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             border-radius: 50%;
         }
 
-.profile-name {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 3rem; /* SANGAT BESAR */
-    font-weight: 700;
-    margin-bottom: 12px;
-    background: linear-gradient(to right, var(--accent), var(--accent-light));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 0 20px rgba(108, 99, 255, 0.8); /* LEBIH BESAR */
-    letter-spacing: 1px; /* Tambah jarak antar huruf */
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .profile-name {
-        font-size: 2.5rem; /* BESAR */
-    }
-}
-
-@media (max-width: 480px) {
-    .profile-name {
-        font-size: 2.1rem; /* BESAR */
-    }
-}
-
-        .profile-description {
-            font-size: 3rem; /* TETAP BESAR */
-            color: var(--text-secondary);
-            max-width: 500px;
-            margin: 0 auto 25px; /* TETAP BESAR */
-            padding: 0 15px;
-            line-height: 1.5;
+        .profile-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(108, 99, 255, 0.8);
+            letter-spacing: 0.5px;
         }
 
-        /* Links Section - TETAP SAMA */
+        .profile-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            max-width: 90%;
+            margin: 0 auto 15px;
+            padding: 0 10px;
+            line-height: 1.4;
+        }
+
+        /* Links Section dengan GARIS NEON MEMUTARI TOMBOL */
         .links-section {
-            padding: 10px 0 35px;
+            padding: 5px 0 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Custom scrollbar */
+        .links-section::-webkit-scrollbar {
+            width: 3px;
+        }
+        
+        .links-section::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .links-section::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 3px;
         }
 
         .link-item {
             display: block;
-            margin-bottom: 18px;
+            margin-bottom: 12px;
             text-decoration: none;
             position: relative;
-            transition: all 0.3s ease;
+        }
+
+        /* CONTAINER untuk garis neon memutari */
+        .link-button-container {
+            position: relative;
+            display: block;
+            border-radius: 10px;
+            padding: 2px;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        /* GARIS NEON YANG MEMUTARI TOMBOL */
+        .circle-neon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        /* GARIS NEON UTAMA YANG MEMUTARI */
+        .neon-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            box-shadow: 0 0 0 1.5px transparent,
+                        inset 0 0 0 1.5px transparent;
+            animation: neonRotate 3s linear infinite;
+            z-index: 10;
+        }
+
+        /* ANIMASI ROTASI GARIS NEON */
+        @keyframes neonRotate {
+            0% {
+                box-shadow: 
+                    0 0 0 1.5px var(--accent),
+                    0 0 8px var(--accent),
+                    0 0 15px var(--accent),
+                    inset 0 0 0 1px transparent;
+                clip-path: polygon(0 0, 100% 0, 100% 10%, 0 10%);
+            }
+            25% {
+                box-shadow: 
+                    0 0 0 1.5px var(--accent),
+                    0 0 8px var(--accent),
+                    0 0 15px var(--accent),
+                    inset 0 0 0 1px transparent;
+                clip-path: polygon(100% 0, 100% 100%, 90% 100%, 90% 0);
+            }
+            50% {
+                box-shadow: 
+                    0 0 0 1.5px var(--accent),
+                    0 0 8px var(--accent),
+                    0 0 15px var(--accent),
+                    inset 0 0 0 1px transparent;
+                clip-path: polygon(100% 100%, 0 100%, 0 90%, 100% 90%);
+            }
+            75% {
+                box-shadow: 
+                    0 0 0 1.5px var(--accent),
+                    0 0 8px var(--accent),
+                    0 0 15px var(--accent),
+                    inset 0 0 0 1px transparent;
+                clip-path: polygon(0 100%, 0 0, 10% 0, 10% 100%);
+            }
+            100% {
+                box-shadow: 
+                    0 0 0 1.5px var(--accent),
+                    0 0 8px var(--accent),
+                    0 0 15px var(--accent),
+                    inset 0 0 0 1px transparent;
+                clip-path: polygon(0 0, 100% 0, 100% 10%, 0 10%);
+            }
+        }
+
+        /* GARIS NEON KEDUA (warna berbeda) */
+        .neon-ring-blue {
+            animation: neonRotateBlue 3s linear infinite;
+        }
+
+        @keyframes neonRotateBlue {
+            0% {
+                box-shadow: 
+                    0 0 0 1.5px var(--accent-blue),
+                    0 0 8px var(--accent-blue),
+                    0 0 15px var(--accent-blue),
+                    inset 0 0 0 1px transparent;
+                clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+            }
+            100% {
+                box-shadow: 
+                    0 0 0 1.5px var(--accent-blue),
+                    0 0 8px var(--accent-blue),
+                    0 0 15px var(--accent-blue),
+                    inset 0 0 0 1px transparent;
+                clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ALTERNATIF: GARIS NEON DENGAN CONIC GRADIENT */
+        .conic-neon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                var(--accent) 90deg,
+                transparent 180deg,
+                var(--accent-blue) 270deg,
+                transparent 360deg
+            );
+            animation: conicRotate 2s linear infinite;
+            z-index: 9;
+            opacity: 0.8;
+            padding: 1.2px;
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+
+        @keyframes conicRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ALTERNATIF 2: GARIS NEON YANG BERGESER */
+        .moving-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                var(--accent) 25%,
+                transparent 50%,
+                var(--accent-blue) 75%,
+                transparent 100%
+            );
+            background-size: 200% 100%;
+            animation: moveLine 3s linear infinite;
+            z-index: 8;
+            opacity: 0.7;
+            padding: 1.2px;
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+
+        @keyframes moveLine {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
         }
 
         .link-button {
             display: flex;
             align-items: center;
-            padding: 18px 22px;
-            background-color: rgba(26, 31, 75, 0.7);
-            border-radius: 15px;
-            border: 2px solid rgba(108, 99, 255, 0.3);
+            padding: 12px 16px;
+            background-color: rgba(26, 31, 75, 0.95);
+            border-radius: 8px;
+            border: none;
             transition: all 0.4s ease;
             backdrop-filter: blur(10px);
             position: relative;
             overflow: hidden;
+            z-index: 2;
+            height: 52px;
         }
 
         .link-button:after {
@@ -180,42 +366,64 @@
             transition: left 0.7s ease;
         }
 
-        .link-item:hover .link-button:after {
+        .link-item:hover .link-button:after,
+        .link-item:active .link-button:after {
             left: 100%;
         }
 
-        .link-item:hover .link-button {
-            transform: translateY(-4px);
+        .link-item:hover .link-button,
+        .link-item:active .link-button {
+            transform: translateY(-2px);
             box-shadow: var(--neon-glow);
-            border-color: var(--accent);
+        }
+
+        .link-item:hover .neon-ring,
+        .link-item:active .neon-ring {
+            animation-duration: 1.5s;
+        }
+
+        .link-item:hover .conic-neon,
+        .link-item:active .conic-neon {
+            animation-duration: 1s;
+        }
+
+        .link-item:hover .moving-line,
+        .link-item:active .moving-line {
+            animation-duration: 1.5s;
         }
 
         .link-icon {
-            width: 48px;
-            height: 48px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
-            margin-right: 18px;
+            font-size: 1rem;
+            margin-right: 14px;
             flex-shrink: 0;
             transition: transform 0.3s ease;
+            z-index: 3;
         }
 
-        .link-item:hover .link-icon {
-            transform: scale(1.1);
+        .link-item:hover .link-icon,
+        .link-item:active .link-icon {
+            transform: scale(1.05);
         }
 
         .link-content {
             flex-grow: 1;
             text-align: left;
+            z-index: 3;
+            display: flex;
+            align-items: center;
         }
 
         .link-title {
             font-family: 'Exo 2', sans-serif;
-            font-size: 1.2rem;
+            font-size: 0.95rem;
             font-weight: 600;
+            color: #ffffff !important;
         }
 
         /* Warna khusus untuk setiap link */
@@ -224,14 +432,48 @@
             color: var(--whatsapp);
         }
 
-        .whatsapp .link-button {
-            border-color: rgba(37, 211, 102, 0.3);
+        .whatsapp .neon-ring {
+            box-shadow: 
+                0 0 0 1.5px var(--whatsapp),
+                0 0 8px var(--whatsapp),
+                0 0 15px var(--whatsapp),
+                inset 0 0 0 1px transparent;
         }
 
-        .whatsapp:hover .link-button {
-            box-shadow: 0 0 15px rgba(37, 211, 102, 0.7),
-                        0 0 30px rgba(37, 211, 102, 0.5);
-            border-color: var(--whatsapp);
+        .whatsapp .neon-ring-blue {
+            box-shadow: 
+                0 0 0 1.5px #2af07a,
+                0 0 8px #2af07a,
+                0 0 15px #2af07a,
+                inset 0 0 0 1px transparent;
+        }
+
+        .whatsapp .conic-neon {
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                var(--whatsapp) 90deg,
+                transparent 180deg,
+                #2af07a 270deg,
+                transparent 360deg
+            );
+        }
+
+        .whatsapp .moving-line {
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                var(--whatsapp) 25%,
+                transparent 50%,
+                #2af07a 75%,
+                transparent 100%
+            );
+        }
+
+        .whatsapp:hover .link-button,
+        .whatsapp:active .link-button {
+            box-shadow: 0 0 15px rgba(37, 211, 102, 0.5),
+                        0 0 30px rgba(37, 211, 102, 0.3);
         }
 
         .telegram .link-icon {
@@ -239,14 +481,48 @@
             color: var(--telegram);
         }
 
-        .telegram .link-button {
-            border-color: rgba(0, 136, 204, 0.3);
+        .telegram .neon-ring {
+            box-shadow: 
+                0 0 0 1.5px var(--telegram),
+                0 0 8px var(--telegram),
+                0 0 15px var(--telegram),
+                inset 0 0 0 1px transparent;
         }
 
-        .telegram:hover .link-button {
-            box-shadow: 0 0 15px rgba(0, 136, 204, 0.7),
-                        0 0 30px rgba(0, 136, 204, 0.5);
-            border-color: var(--telegram);
+        .telegram .neon-ring-blue {
+            box-shadow: 
+                0 0 0 1.5px #00aaff,
+                0 0 8px #00aaff,
+                0 0 15px #00aaff,
+                inset 0 0 0 1px transparent;
+        }
+
+        .telegram .conic-neon {
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                var(--telegram) 90deg,
+                transparent 180deg,
+                #00aaff 270deg,
+                transparent 360deg
+            );
+        }
+
+        .telegram .moving-line {
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                var(--telegram) 25%,
+                transparent 50%,
+                #00aaff 75%,
+                transparent 100%
+            );
+        }
+
+        .telegram:hover .link-button,
+        .telegram:active .link-button {
+            box-shadow: 0 0 15px rgba(0, 136, 204, 0.5),
+                        0 0 30px rgba(0, 136, 204, 0.3);
         }
 
         .youtube .link-icon {
@@ -254,124 +530,364 @@
             color: var(--youtube);
         }
 
-        .youtube .link-button {
-            border-color: rgba(255, 0, 0, 0.3);
+        .youtube .neon-ring {
+            box-shadow: 
+                0 0 0 1.5px var(--youtube),
+                0 0 8px var(--youtube),
+                0 0 15px var(--youtube),
+                inset 0 0 0 1px transparent;
         }
 
-        .youtube:hover .link-button {
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.7),
-                        0 0 30px rgba(255, 0, 0, 0.5);
-            border-color: var(--youtube);
+        .youtube .neon-ring-blue {
+            box-shadow: 
+                0 0 0 1.5px #ff3333,
+                0 0 8px #ff3333,
+                0 0 15px #ff3333,
+                inset 0 0 0 1px transparent;
         }
 
-        .tiktok .link-icon {
-            background-color: rgba(0, 0, 0, 0.2);
-            color: var(--tiktok);
+        .youtube .conic-neon {
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                var(--youtube) 90deg,
+                transparent 180deg,
+                #ff3333 270deg,
+                transparent 360deg
+            );
         }
 
-        .tiktok .link-button {
-            border-color: rgba(0, 0, 0, 0.3);
+        .youtube .moving-line {
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                var(--youtube) 25%,
+                transparent 50%,
+                #ff3333 75%,
+                transparent 100%
+            );
         }
 
-        .tiktok:hover .link-button {
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.7),
-                        0 0 30px rgba(0, 0, 0, 0.5);
-            border-color: var(--tiktok);
+        .youtube:hover .link-button,
+        .youtube:active .link-button {
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5),
+                        0 0 30px rgba(255, 0, 0, 0.3);
         }
+
+/* Warna khusus untuk TIKTOK - DIUBAH JADI UNGU */
+.tiktok .neon-ring {
+    box-shadow: 
+        0 0 0 1.5px var(--accent),
+        0 0 8px var(--accent),
+        0 0 15px var(--accent),
+        inset 0 0 0 1px transparent;
+}
+
+.tiktok .neon-ring-blue {
+    box-shadow: 
+        0 0 0 1.5px var(--accent-light),
+        0 0 8px var(--accent-light),
+        0 0 15px var(--accent-light),
+        inset 0 0 0 1px transparent;
+}
+
+.tiktok .conic-neon {
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        var(--accent) 90deg,
+        transparent 180deg,
+        var(--accent-light) 270deg,
+        transparent 360deg
+    );
+}
+
+.tiktok .moving-line {
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--accent) 25%,
+        transparent 50%,
+        var(--accent-light) 75%,
+        transparent 100%
+    );
+}
+
+.tiktok:hover .link-button,
+.tiktok:active .link-button {
+    box-shadow: 0 0 15px rgba(108, 99, 255, 0.5),
+                0 0 30px rgba(108, 99, 255, 0.3);
+}
 
         .product .link-icon {
             background-color: rgba(255, 107, 107, 0.2);
             color: var(--product);
         }
 
-        .product .link-button {
-            border-color: rgba(255, 107, 107, 0.3);
+        .product .neon-ring {
+            box-shadow: 
+                0 0 0 1.5px var(--product),
+                0 0 8px var(--product),
+                0 0 15px var(--product),
+                inset 0 0 0 1px transparent;
         }
 
-        .product:hover .link-button {
-            box-shadow: 0 0 15px rgba(255, 107, 107, 0.7),
-                        0 0 30px rgba(255, 107, 107, 0.5);
-            border-color: var(--product);
+        .product .neon-ring-blue {
+            box-shadow: 
+                0 0 0 1.5px #ff8e8e,
+                0 0 8px #ff8e8e,
+                0 0 15px #ff8e8e,
+                inset 0 0 0 1px transparent;
         }
 
-        /* Footer - TETAP SAMA */
+        .product .conic-neon {
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                var(--product) 90deg,
+                transparent 180deg,
+                #ff8e8e 270deg,
+                transparent 360deg
+            );
+        }
+
+        .product .moving-line {
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                var(--product) 25%,
+                transparent 50%,
+                #ff8e8e 75%,
+                transparent 100%
+            );
+        }
+
+        .product:hover .link-button,
+        .product:active .link-button {
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.5),
+                        0 0 30px rgba(255, 107, 107, 0.3);
+        }
+
+        /* Footer */
         .footer {
             text-align: center;
-            padding: 18px 0;
+            padding: 12px 0;
             color: var(--text-secondary);
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-                max-width: 100%;
+        /* Profil Image Neon Animation */
+        .profile-image {
+            position: relative;
+            overflow: visible;
+        }
+
+        .profile-neon-ring {
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 50%;
+            z-index: 2;
+            pointer-events: none;
+            animation: profileNeonPulse 2s infinite;
+            box-shadow: 
+                0 0 0 2px transparent,
+                0 0 0 4px transparent;
+        }
+
+        @keyframes profileNeonPulse {
+            0% {
+                box-shadow: 
+                    0 0 0 2px var(--accent),
+                    0 0 15px var(--accent),
+                    0 0 30px var(--accent),
+                    inset 0 0 0 1px transparent;
+                opacity: 0.8;
+            }
+            25% {
+                box-shadow: 
+                    0 0 0 2px var(--accent-blue),
+                    0 0 15px var(--accent-blue),
+                    0 0 30px var(--accent-blue),
+                    inset 0 0 0 1px transparent;
+                opacity: 0.4;
+            }
+            50% {
+                box-shadow: 
+                    0 0 0 2px var(--accent),
+                    0 0 15px var(--accent),
+                    0 0 30px var(--accent),
+                    inset 0 0 0 1px transparent;
+                opacity: 0.8;
+            }
+            75% {
+                box-shadow: 
+                    0 0 0 2px var(--accent-blue),
+                    0 0 15px var(--accent-blue),
+                    0 0 30px var(--accent-blue),
+                    inset 0 0 0 1px transparent;
+                opacity: 0.4;
+            }
+            100% {
+                box-shadow: 
+                    0 0 0 2px var(--accent),
+                    0 0 15px var(--accent),
+                    0 0 30px var(--accent),
+                    inset 0 0 0 1px transparent;
+                opacity: 0.8;
+            }
+        }
+
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            position: relative;
+            z-index: 1;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* HILANGKAN IKON URL EXTERNAL DAN PANAH */
+        .link-button i.fa-external-link-alt,
+        .link-button i.fa-arrow-right {
+            display: none !important;
+        }
+        
+        /* Touch-friendly improvements */
+        .link-item {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* For very small screens */
+        @media (max-height: 700px) {
+            .profile-image {
+                width: 75px;
+                height: 75px;
             }
             
             .profile-name {
-                font-size: 1.6rem;
-            }
-            
-            /* Gambar profil mobile SANGAT KECIL */
-            .profile-image {
-                width: 22px; /* SANGAT KECIL */
-                height: 22px; /* SANGAT KECIL */
+                font-size: 1.9rem;
             }
             
             .profile-description {
+                font-size: 0.8rem;
+                margin-bottom: 12px;
+            }
+            
+            .link-button {
+                padding: 10px 14px;
+                height: 48px;
+            }
+            
+            .link-icon {
+                width: 32px;
+                height: 32px;
                 font-size: 0.95rem;
-                margin-bottom: 20px;
-            }
-            
-            .link-button {
-                padding: 16px 20px;
-            }
-            
-            .link-icon {
-                width: 44px;
-                height: 44px;
-                font-size: 1.3rem;
-                margin-right: 15px;
-            }
-            
-            .link-title {
-                font-size: 1.1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .profile-name {
-                font-size: 1.4rem;
-            }
-            
-            /* Gambar profil mobile LEBIH KECIL LAGI */
-            .profile-image {
-                width: 20px; /* SANGAT KECIL */
-                height: 20px; /* SANGAT KECIL */
-            }
-            
-            .profile-description {
-                font-size: 0.9rem;
-                padding: 0 10px;
-            }
-            
-            .link-button {
-                padding: 14px 16px;
-            }
-            
-            .link-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 1.2rem;
                 margin-right: 12px;
             }
             
             .link-title {
-                font-size: 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .footer {
+                padding: 10px 0;
+                font-size: 0.7rem;
             }
         }
+        
+        @media (max-height: 600px) {
+            .profile-image {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .profile-name {
+                font-size: 1.7rem;
+            }
+            
+            .profile-description {
+                font-size: 0.75rem;
+                margin-bottom: 10px;
+                line-height: 1.3;
+            }
+            
+            .link-button {
+                padding: 8px 12px;
+                height: 44px;
+            }
+            
+            .link-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+                margin-right: 10px;
+            }
+            
+            .link-title {
+                font-size: 0.85rem;
+            }
+            
+            .link-item {
+                margin-bottom: 10px;
+            }
+            
+            .footer {
+                padding: 8px 0;
+                font-size: 0.65rem;
+            }
+        }
+        
+        /* Landscape mode optimization */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 10px;
+            }
+            
+            .profile-section {
+                width: 40%;
+                padding: 5px 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            
+            .links-section {
+                width: 60%;
+                padding-left: 15px;
+            }
+            
+            .footer {
+                width: 100%;
+                order: 3;
+                padding: 8px 0;
+            }
+            
+            .profile-image {
+                width: 70px;
+                height: 70px;
+                margin-bottom: 8px;
+            }
+            
+            .profile-name {
+                font-size: 1.6rem;
+                margin-bottom: 3px;
+            }
+            
+            .profile-description {
+                font-size: 0.7rem;
+                margin-bottom: 8px;
+                line-height: 1.2;
+            }
+        }
+        
     </style>
 </head>
 <body>
@@ -379,81 +895,117 @@
     <div class="night-sky" id="night-sky"></div>
     
     <div class="container">
-        <!-- Profil Section - GAMBAR PROFIL SANGAT KECIL -->
+        <!-- Profil Section -->
         <section class="profile-section">
-            <a href="https://catbox.moe" target="_blank" class="profile-image">
+            <div class="profile-image">
+                <div class="profile-neon-ring"></div>
                 <img src="https://files.catbox.moe/5qq2bm.jpg" alt="Dray Official">
-            </a>
-            <h1 class="profile-name">Dray Official</h1>
+            </div>
+            <h1 class="profile-name">DRAY</h1>
             <p class="profile-description">
                 Digital creator & tech enthusiast. Berbagi konten menarik tentang teknologi, tutorial digital, dan berbagai produk eksklusif untuk kebutuhan digital Anda.
             </p>
         </section>
         
-        <!-- Links Section - TETAP SAMA -->
+        <!-- Links Section - DENGAN GARIS NEON MEMUTARI TOMBOL -->
         <section class="links-section">
             <a href="https://wa.me/6283151568511" target="_blank" class="link-item whatsapp">
-                <div class="link-button">
-                    <div class="link-icon">
-                        <i class="fab fa-whatsapp"></i>
+                <div class="link-button-container">
+                    <div class="circle-neon">
+                        <div class="neon-ring"></div>
+                        <div class="neon-ring neon-ring-blue"></div>
+                        <div class="conic-neon"></div>
+                        <div class="moving-line"></div>
                     </div>
-                    <div class="link-content">
-                        <div class="link-title">WhatsApp</div>
+                    <div class="link-button">
+                        <div class="link-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="link-content">
+                            <div class="link-title">WhatsApp</div>
+                        </div>
                     </div>
-                    <i class="fas fa-external-link-alt" style="margin-left: 10px; opacity: 0.7; font-size: 0.9rem;"></i>
                 </div>
             </a>
             
             <a href="https://t.me/Drayoffc" target="_blank" class="link-item telegram">
-                <div class="link-button">
-                    <div class="link-icon">
-                        <i class="fab fa-telegram"></i>
+                <div class="link-button-container">
+                    <div class="circle-neon">
+                        <div class="neon-ring"></div>
+                        <div class="neon-ring neon-ring-blue"></div>
+                        <div class="conic-neon"></div>
+                        <div class="moving-line"></div>
                     </div>
-                    <div class="link-content">
-                        <div class="link-title">Telegram</div>
+                    <div class="link-button">
+                        <div class="link-icon">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                        <div class="link-content">
+                            <div class="link-title">Telegram</div>
+                        </div>
                     </div>
-                    <i class="fas fa-external-link-alt" style="margin-left: 10px; opacity: 0.7; font-size: 0.9rem;"></i>
                 </div>
             </a>
             
             <a href="https://youtube.com/@Drayyyxd" target="_blank" class="link-item youtube">
-                <div class="link-button">
-                    <div class="link-icon">
-                        <i class="fab fa-youtube"></i>
+                <div class="link-button-container">
+                    <div class="circle-neon">
+                        <div class="neon-ring"></div>
+                        <div class="neon-ring neon-ring-blue"></div>
+                        <div class="conic-neon"></div>
+                        <div class="moving-line"></div>
                     </div>
-                    <div class="link-content">
-                        <div class="link-title">YouTube</div>
+                    <div class="link-button">
+                        <div class="link-icon">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                        <div class="link-content">
+                            <div class="link-title">YouTube</div>
+                        </div>
                     </div>
-                    <i class="fas fa-external-link-alt" style="margin-left: 10px; opacity: 0.7; font-size: 0.9rem;"></i>
                 </div>
             </a>
             
             <a href="https://tiktok.com/@Draykcc" target="_blank" class="link-item tiktok">
-                <div class="link-button">
-                    <div class="link-icon">
-                        <i class="fab fa-tiktok"></i>
+                <div class="link-button-container">
+                    <div class="circle-neon">
+                        <div class="neon-ring"></div>
+                        <div class="neon-ring neon-ring-blue"></div>
+                        <div class="conic-neon"></div>
+                        <div class="moving-line"></div>
                     </div>
-                    <div class="link-content">
-                        <div class="link-title">TikTok</div>
+                    <div class="link-button">
+                        <div class="link-icon">
+                            <i class="fab fa-tiktok"></i>
+                        </div>
+                        <div class="link-content">
+                            <div class="link-title">TikTok</div>
+                        </div>
                     </div>
-                    <i class="fas fa-external-link-alt" style="margin-left: 10px; opacity: 0.7; font-size: 0.9rem;"></i>
                 </div>
             </a>
             
             <a href="produk.html" class="link-item product">
-                <div class="link-button">
-                    <div class="link-icon">
-                        <i class="fas fa-store"></i>
+                <div class="link-button-container">
+                    <div class="circle-neon">
+                        <div class="neon-ring"></div>
+                        <div class="neon-ring neon-ring-blue"></div>
+                        <div class="conic-neon"></div>
+                        <div class="moving-line"></div>
                     </div>
-                    <div class="link-content">
-                        <div class="link-title">Produk & Layanan</div>
+                    <div class="link-button">
+                        <div class="link-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <div class="link-content">
+                            <div class="link-title">Produk & Layanan</div>
+                        </div>
                     </div>
-                    <i class="fas fa-arrow-right" style="margin-left: 10px; opacity: 0.7; font-size: 0.9rem;"></i>
                 </div>
             </a>
         </section>
         
-        <!-- Footer - TETAP SAMA -->
+        <!-- Footer -->
         <footer class="footer">
             <p>&copy; 2026 Dray Official. All rights reserved.</p>
             <p>Made with <i class="fas fa-heart" style="color:#ff6b6b;"></i> Dray Imoet</p>
@@ -464,85 +1016,55 @@
         // Fungsi untuk membuat bintang di langit malam
         function createStars() {
             const nightSky = document.getElementById('night-sky');
-            const starCount = 200;
+            const starCount = 150; // Kurangi jumlah bintang untuk performa HP
             
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.classList.add('star');
                 
-                // Ukuran bintang acak
-                const size = Math.random() * 3 + 1;
+                const size = Math.random() * 2 + 1; // Ukuran bintang lebih kecil
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
-                
-                // Posisi acak
                 star.style.left = `${Math.random() * 100}%`;
                 star.style.top = `${Math.random() * 100}%`;
+                star.style.opacity = Math.random() * 0.6 + 0.2; // Opacity lebih rendah
                 
-                // Opasitas acak
-                star.style.opacity = Math.random() * 0.8 + 0.2;
-                
-                // Animasi berkedip
-                const duration = Math.random() * 5 + 3;
-                const delay = Math.random() * 5;
+                const duration = Math.random() * 4 + 2;
+                const delay = Math.random() * 4;
                 star.style.animation = `twinkle ${duration}s infinite ${delay}s alternate`;
                 
                 nightSky.appendChild(star);
             }
             
-            // Tambahkan style untuk animasi berkedip
             const style = document.createElement('style');
-            style.textContent = `
-                @keyframes twinkle {
-                    0% { opacity: 0.3; }
-                    100% { opacity: 1; }
-                }
-            `;
+            style.textContent = `@keyframes twinkle { 0% { opacity: 0.2; } 100% { opacity: 0.8; } }`;
             document.head.appendChild(style);
         }
 
-        // Fungsi untuk membuat animasi meteor
+        // Fungsi untuk membuat animasi meteor (kurangi jumlah untuk HP)
         function createMeteors() {
             const nightSky = document.getElementById('night-sky');
-            const meteorCount = 8;
+            const meteorCount = 4; // Kurangi jumlah meteor
             
             for (let i = 0; i < meteorCount; i++) {
                 const meteor = document.createElement('div');
                 meteor.classList.add('meteor');
-                
-                // Posisi horizontal acak
                 meteor.style.left = `${Math.random() * 100}%`;
-                
-                // Delay animasi acak
-                const delay = Math.random() * 20;
+                const delay = Math.random() * 25; // Delay lebih panjang
                 meteor.style.animationDelay = `${delay}s`;
-                
-                // Durasi animasi acak
                 const duration = Math.random() * 2 + 1;
                 meteor.style.animation = `shootingStar ${duration}s linear infinite`;
-                
-                // Rotasi acak untuk variasi arah meteor
                 const rotation = Math.random() * 30 + 20;
                 meteor.style.transform = `rotate(${rotation}deg)`;
-                
                 nightSky.appendChild(meteor);
             }
             
-            // Tambahkan style untuk animasi meteor
             const meteorStyle = document.createElement('style');
             meteorStyle.textContent = `
                 @keyframes shootingStar {
-                    0% {
-                        transform: translateY(-100px) translateX(0) rotate(20deg);
-                        opacity: 0;
-                    }
-                    10% {
-                        opacity: 1;
-                    }
-                    100% {
-                        transform: translateY(1000px) translateX(-1000px) rotate(20deg);
-                        opacity: 0;
-                    }
+                    0% { transform: translateY(-100px) translateX(0) rotate(20deg); opacity: 0; }
+                    10% { opacity: 1; }
+                    100% { transform: translateY(800px) translateX(-800px) rotate(20deg); opacity: 0; }
                 }
             `;
             document.head.appendChild(meteorStyle);
@@ -550,35 +1072,35 @@
 
         // Inisialisasi halaman saat dimuat
         document.addEventListener('DOMContentLoaded', function() {
-            // Buat bintang dan meteor
+            // Buat bintang dan meteor (dengan jumlah lebih sedikit)
             createStars();
             createMeteors();
             
-            // Efek tambahan untuk gambar profil
-            const profileImage = document.querySelector('.profile-image');
-            profileImage.addEventListener('mouseenter', function() {
-                this.style.transform = 'scale(1.1)';
-                this.style.boxShadow = '0 0 5px rgba(108, 99, 255, 0.8)';
-            });
-            
-            profileImage.addEventListener('mouseleave', function() {
-                this.style.transform = 'scale(1)';
-                this.style.boxShadow = '0 0 3px rgba(108, 99, 255, 0.5)';
-            });
-            
-            // Efek kilat pada tombol saat dihover
+            // Optimasi untuk sentuhan di HP
             document.querySelectorAll('.link-item').forEach(item => {
-                item.addEventListener('mouseenter', function() {
+                item.addEventListener('touchstart', function() {
                     const icon = this.querySelector('.link-icon');
-                    icon.style.transform = 'scale(1.1)';
+                    icon.style.transform = 'scale(1.05)';
                 });
                 
-                item.addEventListener('mouseleave', function() {
+                item.addEventListener('touchend', function() {
                     const icon = this.querySelector('.link-icon');
                     icon.style.transform = 'scale(1)';
                 });
             });
         });
+
+        // Cegah zoom pada HP
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+
+        // Cegah scroll default saat menyentuh elemen
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.classList.contains('links-section')) {
+                e.stopPropagation();
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>
