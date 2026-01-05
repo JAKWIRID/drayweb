@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dray Store - Toko Digital Astronomi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0a0e29;
+            --secondary: #1a1f4b;
+            --accent: #6c63ff;
+            --accent-light: #8a84ff;
+            --text: #ffffff;
+            --text-secondary: #b0b0d0;
+            --card-bg: rgba(26, 31, 75, 0.7);
+            --border: rgba(108, 99, 255, 0.3);
+            --whatsapp: #25D366;
+            --telegram: #0088cc;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background-color: var(--primary);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+        }
+
+        .stars-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(ellipse at center, #0a0e29 0%, #050716 100%);
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0 20px;
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--accent);
+        }
+
+        .logo h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(to right, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(108, 99, 255, 0.5);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent), #4a43d4);
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 500;
+            padding: 18px 40px;
+            border-radius: 12px;
+            text-decoration: none;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4);
+            border: 2px solid rgba(108, 99, 255, 0.2);
+            margin: 20px 0 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(108, 99, 255, 0.6);
+            letter-spacing: 1.5px;
+        }
+
+        .cta-button:after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(30deg);
+            transition: transform 0.8s;
+        }
+
+        .cta-button:hover:after {
+            transform: rotate(30deg) translate(20%, 20%);
+        }
+
+        .products-section {
+            display: none;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .section-title h2 {
+            font-size: 2.2rem;
+            display: inline-block;
+            padding-bottom: 15px;
+            position: relative;
+        }
+
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, transparent, var(--accent), transparent);
+            border-radius: 2px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .product-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 1px solid var(--border);
+            position: relative;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            border-color: var(--accent);
+        }
+
+        .product-header {
+            padding: 25px 25px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .product-header h3 {
+            font-size: 1.6rem;
+            color: var(--accent-light);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .product-header h3 i {
+            font-size: 1.4rem;
+        }
+
+        .product-description {
+            padding: 20px 25px;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            flex-grow: 1;
+        }
+
+        .product-description ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .product-description li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .product-description li:before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        .product-pricing {
+            padding: 20px 25px;
+            background-color: rgba(10, 14, 41, 0.5);
+            border-top: 1px solid var(--border);
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .price-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .price-label {
+            font-weight: 500;
+        }
+
+        .price-value {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: var(--accent-light);
+        }
+
+        .promo-badge {
+            background: linear-gradient(to right, #ff6b6b, #ff8e53);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 8px;
+            font-weight: 600;
+        }
+
+        .order-section {
+            padding: 20px 25px;
+            border-top: 1px solid var(--border);
+        }
+
+        .order-button {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent), #4a43d4);
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .order-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(108, 99, 255, 0.5);
+            letter-spacing: 1.2px;
+        }
+
+        .order-options {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .whatsapp-btn, .telegram-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .whatsapp-btn {
+            background-color: rgba(37, 211, 102, 0.15);
+            color: var(--whatsapp);
+            border: 1px solid rgba(37, 211, 102, 0.3);
+        }
+
+        .whatsapp-btn:hover {
+            background-color: rgba(37, 211, 102, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.2);
+        }
+
+        .telegram-btn {
+            background-color: rgba(0, 136, 204, 0.15);
+            color: var(--telegram);
+            border: 1px solid rgba(0, 136, 204, 0.3);
+        }
+
+        .telegram-btn:hover {
+            background-color: rgba(0, 136, 204, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.2);
+        }
+
+        .back-button {
+            display: inline-block;
+            background-color: transparent;
+            color: var(--accent);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            border: 2px solid var(--accent);
+            transition: all 0.3s ease;
+            margin: 20px 0 50px;
+        }
+
+        .back-button:hover {
+            background-color: rgba(108, 99, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 40px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo h1 {
+                font-size: 2.2rem;
+            }
+            
+            .cta-button {
+                font-size: 1.1rem;
+                padding: 15px 30px;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+            
+            .order-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo h1 {
+                font-size: 1.8rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .product-card {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background dengan bintang animasi -->
+    <div class="stars-bg" id="stars-bg"></div>
+    
+    <div class="container">
+        <!-- Header dengan tombol utama -->
+        <header id="main-header">
+            <div class="logo">
+                <i class="fas fa-rocket"></i>
+                <h1>Dray Store</h1>
+            </div>
+            <p class="tagline">Toko Digital dengan Teknologi Masa Depan</p>
+            <a href="#" class="cta-button" id="view-products-btn">
+                <i class="fas fa-shopping-cart"></i> LIHAT HARGA PRODUK
+            </a>
+        </header>
+        
+        <!-- Section produk (awalnya disembunyikan) -->
+        <section class="products-section" id="products-section">
+            <div class="section-title">
+                <h2><i class="fas fa-star"></i> KATALOG PRODUK</h2>
+            </div>
+            
+            <div class="products-grid" id="products-container">
+                <!-- Produk akan dimuat melalui JavaScript -->
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="#" class="back-button" id="back-to-home">
+                    <i class="fas fa-arrow-left"></i> KEMBALI KE HALAMAN UTAMA
+                </a>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2023 Dray Store. Semua hak dilindungi.</p>
+            <p>Dibuat dengan <i class="fas fa-heart" style="color:#ff6b6b;"></i> dan tema astronomi</p>
+        </footer>
+    </div>
+
+    <script>
+        // Data produk yang dapat dengan mudah diubah
+        const productsData = [
+            {
+                id: 1,
+                name: "Panel Pterodactyl",
+                icon: "fas fa-server",
+                description: "Panel server dengan spesifikasi RAM bervariasi sesuai kebutuhan Anda. Dukungan teknis 24/7 dan uptime 99.9%.",
+                features: [
+                    "RAM 5GB - 9GB dan unlimited",
+                    "Harga terjangkau mulai dari 3K",
+                    "Control panel yang mudah digunakan",
+                    "Dukungan server global",
+                    "Backup otomatis harian"
+                ],
+                pricing: [
+                    { label: "RAM 5GB", price: "Rp 3.000" },
+                    { label: "RAM 7GB", price: "Rp 5.000" },
+                    { label: "RAM 9GB", price: "Rp 7.000" },
+                    { label: "RAM Unlimited", price: "Rp 10.000" }
+                ]
+            },
+            {
+                id: 2,
+                name: "Nokos Indonesia",
+                icon: "fas fa-sim-card",
+                description: "Layanan nomor kosong Indonesia untuk verifikasi berbagai platform digital. Aman, cepat, dan terpercaya.",
+                features: [
+                    "Nomor Indonesia asli",
+                    "Proses verifikasi cepat",
+                    "Dukungan berbagai platform",
+                    "Harga terjangkau",
+                    "Garansi penggantian jika gagal"
+                ],
+                pricing: [
+                    { label: "Per Verifikasi", price: "Rp 5.000", promo: true }
+                ]
+            },
+            {
+                id: 3,
+                name: "APK BUG ZENO EXPLOIT",
+                icon: "fas fa-bug",
+                description: "Aplikasi eksklusif dengan berbagai fitur bug untuk keperluan tertentu. Kompatibel dengan Android & iOS.",
+                features: [
+                    "Bug Force Close Invisible",
+                    "Bug Android & IOS",
+                    "Delay Invisible",
+                    "Bug Group",
+                    "Force Close WA Beta (HARD)",
+                    "Force Close WA Ori & Business",
+                    "Timpa Pesan tetap Force Close",
+                    "Open Chat Force Close",
+                    "Block Number Force Close",
+                    "Hard Fix",
+                    "Kirim bug melalui aplikasi",
+                    "Bisa open jasa bug",
+                    "Tidak perlu panel"
+                ],
+                pricing: [
+                    { label: "1 Minggu", price: "Rp 5.000", promo: true },
+                    { label: "1 Bulan", price: "Rp 15.000" },
+                    { label: "2 Bulan", price: "Rp 25.000" },
+                    { label: "3 Bulan", price: "Rp 40.000" },
+                    { label: "Permanen", price: "Rp 40.000", promo: true },
+                    { label: "Reseller", price: "Rp 75.000", promo: true }
+                ]
+            }
+        ];
+
+        // Informasi kontak yang dapat diubah
+        const contactInfo = {
+            whatsapp: "https://wa.me/6283151568511",
+            telegram: "https://t.me/Drayoffc"
+        };
+
+        // Fungsi untuk membuat elemen bintang
+        function createStars() {
+            const starsBg = document.getElementById('stars-bg');
+            const starCount = 150;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Ukuran bintang acak
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Posisi acak
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Opasitas acak
+                star.style.opacity = Math.random() * 0.7 + 0.3;
+                
+                // Animasi berkedip
+                const duration = Math.random() * 5 + 3;
+                star.style.animation = `twinkle ${duration}s infinite alternate`;
+                
+                starsBg.appendChild(star);
+            }
+            
+            // Tambahkan style untuk animasi berkedip
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes twinkle {
+                    0% { opacity: 0.3; }
+                    100% { opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Fungsi untuk memuat produk ke halaman
+        function loadProducts() {
+            const productsContainer = document.getElementById('products-container');
+            productsContainer.innerHTML = '';
+            
+            productsData.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.id = `product-${product.id}`;
+                
+                // Format daftar fitur
+                const featuresList = product.features.map(feature => `<li>${feature}</li>`).join('');
+                
+                // Format daftar harga
+                const pricingList = product.pricing.map(item => {
+                    const promoBadge = item.promo ? '<span class="promo-badge">PROMO</span>' : '';
+                    return `
+                        <div class="price-item">
+                            <span class="price-label">${item.label}</span>
+                            <span class="price-value">${item.price} ${promoBadge}</span>
+                        </div>
+                    `;
+                }).join('');
+                
+                productCard.innerHTML = `
+                    <div class="product-header">
+                        <h3><i class="${product.icon}"></i> ${product.name}</h3>
+                    </div>
+                    <div class="product-description">
+                        <p>${product.description}</p>
+                        <ul>${featuresList}</ul>
+                    </div>
+                    <div class="product-pricing">
+                        ${pricingList}
+                    </div>
+                    <div class="order-section">
+                        <button class="order-button" data-product-id="${product.id}">
+                            <i class="fas fa-shopping-cart"></i> ORDER SEKARANG
+                        </button>
+                        <div class="order-options" id="order-options-${product.id}">
+                            <a href="${contactInfo.whatsapp}?text=Halo,%20saya%20ingin%20memesan%20${encodeURIComponent(product.name)}" 
+                               target="_blank" class="whatsapp-btn">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </a>
+                            <a href="${contactInfo.telegram}?text=Halo,%20saya%20ingin%20memesan%20${encodeURIComponent(product.name)}" 
+                               target="_blank" class="telegram-btn">
+                                <i class="fab fa-telegram"></i> Telegram
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+                productsContainer.appendChild(productCard);
+            });
+        }
+
+        // Fungsi untuk mengatur event listener tombol order
+        function setupOrderButtons() {
+            // Event delegation untuk tombol order
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('order-button') || 
+                    e.target.closest('.order-button')) {
+                    
+                    const button = e.target.classList.contains('order-button') 
+                        ? e.target 
+                        : e.target.closest('.order-button');
+                    
+                    const productId = button.getAttribute('data-product-id');
+                    const orderOptions = document.getElementById(`order-options-${productId}`);
+                    
+                    // Tutup semua opsi order yang terbuka
+                    document.querySelectorAll('.order-options').forEach(options => {
+                        if (options.id !== `order-options-${productId}`) {
+                            options.style.display = 'none';
+                        }
+                    });
+                    
+                    // Toggle opsi order untuk produk ini
+                    if (orderOptions.style.display === 'grid') {
+                        orderOptions.style.display = 'none';
+                        button.innerHTML = '<i class="fas fa-shopping-cart"></i> ORDER SEKARANG';
+                    } else {
+                        orderOptions.style.display = 'grid';
+                        button.innerHTML = '<i class="fas fa-times"></i> TUTUP PILIHAN';
+                        
+                        // Scroll ke tombol jika di perangkat mobile
+                        if (window.innerWidth <= 768) {
+                            orderOptions.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
+                    }
+                }
+                
+                // Tutup opsi order jika klik di luar
+                if (!e.target.closest('.order-section')) {
+                    document.querySelectorAll('.order-options').forEach(options => {
+                        options.style.display = 'none';
+                    });
+                    
+                    // Reset teks tombol order
+                    document.querySelectorAll('.order-button').forEach(button => {
+                        button.innerHTML = '<i class="fas fa-shopping-cart"></i> ORDER SEKARANG';
+                    });
+                }
+            });
+        }
+
+        // Fungsi untuk mengatur event listener
+        function setupEventListeners() {
+            const viewProductsBtn = document.getElementById('view-products-btn');
+            const backToHomeBtn = document.getElementById('back-to-home');
+            const mainHeader = document.getElementById('main-header');
+            const productsSection = document.getElementById('products-section');
+            
+            // Tombol "LIHAT HARGA PRODUK"
+            viewProductsBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                mainHeader.style.display = 'none';
+                productsSection.style.display = 'block';
+                
+                // Scroll ke atas dengan animasi
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Tombol "KEMBALI KE HALAMAN UTAMA"
+            backToHomeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                productsSection.style.display = 'none';
+                mainHeader.style.display = 'block';
+                
+                // Tutup semua opsi order yang terbuka
+                document.querySelectorAll('.order-options').forEach(options => {
+                    options.style.display = 'none';
+                });
+                
+                // Reset teks tombol order
+                document.querySelectorAll('.order-button').forEach(button => {
+                    button.innerHTML = '<i class="fas fa-shopping-cart"></i> ORDER SEKARANG';
+                });
+                
+                // Scroll ke atas dengan animasi
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+
+        // Inisialisasi halaman saat dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Buat animasi bintang
+            createStars();
+            
+            // Muat produk
+            loadProducts();
+            
+            // Atur event listener untuk tombol order
+            setupOrderButtons();
+            
+            // Atur event listener lainnya
+            setupEventListeners();
+            
+            // Tambahkan efek hover pada kartu produk
+            const productCards = document.querySelectorAll('.product-card');
+            productCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px)';
+                    this.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.4)';
+                    this.style.borderColor = 'var(--accent)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                    this.style.borderColor = 'var(--border)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
