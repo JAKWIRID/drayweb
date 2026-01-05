@@ -1,0 +1,584 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dray Official - Linktree</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400;500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0a0e29;
+            --secondary: #1a1f4b;
+            --accent: #6c63ff;
+            --accent-light: #8a84ff;
+            --text: #ffffff;
+            --text-secondary: #b0b0d0;
+            --neon-glow: 0 0 15px rgba(108, 99, 255, 0.7),
+                          0 0 30px rgba(108, 99, 255, 0.5);
+            --whatsapp: #25D366;
+            --telegram: #0088cc;
+            --youtube: #FF0000;
+            --tiktok: #000000;
+            --product: #FF6B6B;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--primary);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            background: radial-gradient(ellipse at center, #0a0e29 0%, #050716 100%);
+        }
+
+        /* Background dengan bintang dan animasi meteor */
+        .night-sky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .meteor {
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, var(--accent-light), transparent);
+            opacity: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Profil Section */
+        .profile-section {
+            text-align: center;
+            padding: 8px 0 5px; /* Sangat kecil */
+        }
+
+        /* GAMBAR PROFIL DIKECILKAN BANGET - HANYA INI YANG BERUBAH */
+        .profile-image {
+            width: 0px; /* SANGAT KECIL */
+            height: 0px; /* SANGAT KECIL */
+            border-radius: 50%;
+            margin: 0 auto 4px; /* Sangat kecil */
+            overflow: hidden;
+            border: 1px solid var(--accent); /* Tipis */
+            position: relative;
+            box-shadow: 0 0 3px rgba(108, 99, 255, 0.5); /* Minimal */
+            transition: all 0.3s ease;
+        }
+
+        .profile-image:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 5px rgba(108, 99, 255, 0.8);
+        }
+
+        .profile-image img {
+            width: 50%;
+            height: 50%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+.profile-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem; /* SANGAT BESAR */
+    font-weight: 700;
+    margin-bottom: 12px;
+    background: linear-gradient(to right, var(--accent), var(--accent-light));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 20px rgba(108, 99, 255, 0.8); /* LEBIH BESAR */
+    letter-spacing: 1px; /* Tambah jarak antar huruf */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-name {
+        font-size: 2.5rem; /* BESAR */
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-name {
+        font-size: 2.1rem; /* BESAR */
+    }
+}
+
+        .profile-description {
+            font-size: 3rem; /* TETAP BESAR */
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin: 0 auto 25px; /* TETAP BESAR */
+            padding: 0 15px;
+            line-height: 1.5;
+        }
+
+        /* Links Section - TETAP SAMA */
+        .links-section {
+            padding: 10px 0 35px;
+        }
+
+        .link-item {
+            display: block;
+            margin-bottom: 18px;
+            text-decoration: none;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .link-button {
+            display: flex;
+            align-items: center;
+            padding: 18px 22px;
+            background-color: rgba(26, 31, 75, 0.7);
+            border-radius: 15px;
+            border: 2px solid rgba(108, 99, 255, 0.3);
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-button:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.7s ease;
+        }
+
+        .link-item:hover .link-button:after {
+            left: 100%;
+        }
+
+        .link-item:hover .link-button {
+            transform: translateY(-4px);
+            box-shadow: var(--neon-glow);
+            border-color: var(--accent);
+        }
+
+        .link-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-right: 18px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .link-item:hover .link-icon {
+            transform: scale(1.1);
+        }
+
+        .link-content {
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        .link-title {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Warna khusus untuk setiap link */
+        .whatsapp .link-icon {
+            background-color: rgba(37, 211, 102, 0.2);
+            color: var(--whatsapp);
+        }
+
+        .whatsapp .link-button {
+            border-color: rgba(37, 211, 102, 0.3);
+        }
+
+        .whatsapp:hover .link-button {
+            box-shadow: 0 0 15px rgba(37, 211, 102, 0.7),
+                        0 0 30px rgba(37, 211, 102, 0.5);
+            border-color: var(--whatsapp);
+        }
+
+        .telegram .link-icon {
+            background-color: rgba(0, 136, 204, 0.2);
+            color: var(--telegram);
+        }
+
+        .telegram .link-button {
+            border-color: rgba(0, 136, 204, 0.3);
+        }
+
+        .telegram:hover .link-button {
+            box-shadow: 0 0 15px rgba(0, 136, 204, 0.7),
+                        0 0 30px rgba(0, 136, 204, 0.5);
+            border-color: var(--telegram);
+        }
+
+        .youtube .link-icon {
+            background-color: rgba(255, 0, 0, 0.2);
+            color: var(--youtube);
+        }
+
+        .youtube .link-button {
+            border-color: rgba(255, 0, 0, 0.3);
+        }
+
+        .youtube:hover .link-button {
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.7),
+                        0 0 30px rgba(255, 0, 0, 0.5);
+            border-color: var(--youtube);
+        }
+
+        .tiktok .link-icon {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--tiktok);
+        }
+
+        .tiktok .link-button {
+            border-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .tiktok:hover .link-button {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.7),
+                        0 0 30px rgba(0, 0, 0, 0.5);
+            border-color: var(--tiktok);
+        }
+
+        .product .link-icon {
+            background-color: rgba(255, 107, 107, 0.2);
+            color: var(--product);
+        }
+
+        .product .link-button {
+            border-color: rgba(255, 107, 107, 0.3);
+        }
+
+        .product:hover .link-button {
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.7),
+                        0 0 30px rgba(255, 107, 107, 0.5);
+            border-color: var(--product);
+        }
+
+        /* Footer - TETAP SAMA */
+        .footer {
+            text-align: center;
+            padding: 18px 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                max-width: 100%;
+            }
+            
+            .profile-name {
+                font-size: 1.6rem;
+            }
+            
+            /* Gambar profil mobile SANGAT KECIL */
+            .profile-image {
+                width: 22px; /* SANGAT KECIL */
+                height: 22px; /* SANGAT KECIL */
+            }
+            
+            .profile-description {
+                font-size: 0.95rem;
+                margin-bottom: 20px;
+            }
+            
+            .link-button {
+                padding: 16px 20px;
+            }
+            
+            .link-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 1.3rem;
+                margin-right: 15px;
+            }
+            
+            .link-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-name {
+                font-size: 1.4rem;
+            }
+            
+            /* Gambar profil mobile LEBIH KECIL LAGI */
+            .profile-image {
+                width: 20px; /* SANGAT KECIL */
+                height: 20px; /* SANGAT KECIL */
+            }
+            
+            .profile-description {
+                font-size: 0.9rem;
+                padding: 0 10px;
+            }
+            
+            .link-button {
+                padding: 14px 16px;
+            }
+            
+            .link-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+                margin-right: 12px;
+            }
+            
+            .link-title {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background langit malam dengan bintang dan meteor -->
+    <div class="night-sky" id="night-sky"></div>
+    
+    <div class="container">
+        <!-- Profil Section - GAMBAR PROFIL SANGAT KECIL -->
+        <section class="profile-section">
+            <a href="https://catbox.moe" target="_blank" class="profile-image">
+                <img src="https://files.catbox.moe/5qq2bm.jpg" alt="Dray Official">
+            </a>
+            <h1 class="profile-name">Dray Official</h1>
+            <p class="profile-description">
+                Digital creator & tech enthusiast. Berbagi konten menarik tentang teknologi, tutorial digital, dan berbagai produk eksklusif untuk kebutuhan digital Anda.
+            </p>
+        </section>
+        
+        <!-- Links Section - TETAP SAMA -->
+        <section class="links-section">
+            <a href="https://wa.me/6283151568511" target="_blank" class="link-item whatsapp">
+                <div class="link-button">
+                    <div class="link-icon">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div class="link-content">
+                        <div class="link-title">WhatsApp</div>
+                    </div>
+                    <i class="fas fa-external-link-alt" style="margin-left: 10px; opacity: 0.7; font-size: 0.9rem;"></i>
+                </div>
+            </a>
+            
+            <a href="https://t.me/Drayoffc" target="_blank" class="link-item telegram">
+                <div class="link-button">
+                    <div class="link-icon">
+                        <i class="fab fa-telegram"></i>
+                    </div>
+                    <div class="link-content">
+                        <div class="link-title">Telegram</div>
+                    </div>
+                    <i class="fas fa-external-link-alt" style="margin-left: 10px; opacity: 0.7; font-size: 0.9rem;"></i>
+                </div>
+            </a>
+            
+            <a href="https://youtube.com/@Drayyyxd" target="_blank" class="link-item youtube">
+                <div class="link-button">
+                    <div class="link-icon">
+                        <i class="fab fa-youtube"></i>
+                    </div>
+                    <div class="link-content">
+                        <div class="link-title">YouTube</div>
+                    </div>
+                    <i class="fas fa-external-link-alt" style="margin-left: 10px; opacity: 0.7; font-size: 0.9rem;"></i>
+                </div>
+            </a>
+            
+            <a href="https://tiktok.com/@Draykcc" target="_blank" class="link-item tiktok">
+                <div class="link-button">
+                    <div class="link-icon">
+                        <i class="fab fa-tiktok"></i>
+                    </div>
+                    <div class="link-content">
+                        <div class="link-title">TikTok</div>
+                    </div>
+                    <i class="fas fa-external-link-alt" style="margin-left: 10px; opacity: 0.7; font-size: 0.9rem;"></i>
+                </div>
+            </a>
+            
+            <a href="produk.html" class="link-item product">
+                <div class="link-button">
+                    <div class="link-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="link-content">
+                        <div class="link-title">Produk & Layanan</div>
+                    </div>
+                    <i class="fas fa-arrow-right" style="margin-left: 10px; opacity: 0.7; font-size: 0.9rem;"></i>
+                </div>
+            </a>
+        </section>
+        
+        <!-- Footer - TETAP SAMA -->
+        <footer class="footer">
+            <p>&copy; 2026 Dray Official. All rights reserved.</p>
+            <p>Made with <i class="fas fa-heart" style="color:#ff6b6b;"></i> Dray Imoet</p>
+        </footer>
+    </div>
+
+    <script>
+        // Fungsi untuk membuat bintang di langit malam
+        function createStars() {
+            const nightSky = document.getElementById('night-sky');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Ukuran bintang acak
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Posisi acak
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Opasitas acak
+                star.style.opacity = Math.random() * 0.8 + 0.2;
+                
+                // Animasi berkedip
+                const duration = Math.random() * 5 + 3;
+                const delay = Math.random() * 5;
+                star.style.animation = `twinkle ${duration}s infinite ${delay}s alternate`;
+                
+                nightSky.appendChild(star);
+            }
+            
+            // Tambahkan style untuk animasi berkedip
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes twinkle {
+                    0% { opacity: 0.3; }
+                    100% { opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Fungsi untuk membuat animasi meteor
+        function createMeteors() {
+            const nightSky = document.getElementById('night-sky');
+            const meteorCount = 8;
+            
+            for (let i = 0; i < meteorCount; i++) {
+                const meteor = document.createElement('div');
+                meteor.classList.add('meteor');
+                
+                // Posisi horizontal acak
+                meteor.style.left = `${Math.random() * 100}%`;
+                
+                // Delay animasi acak
+                const delay = Math.random() * 20;
+                meteor.style.animationDelay = `${delay}s`;
+                
+                // Durasi animasi acak
+                const duration = Math.random() * 2 + 1;
+                meteor.style.animation = `shootingStar ${duration}s linear infinite`;
+                
+                // Rotasi acak untuk variasi arah meteor
+                const rotation = Math.random() * 30 + 20;
+                meteor.style.transform = `rotate(${rotation}deg)`;
+                
+                nightSky.appendChild(meteor);
+            }
+            
+            // Tambahkan style untuk animasi meteor
+            const meteorStyle = document.createElement('style');
+            meteorStyle.textContent = `
+                @keyframes shootingStar {
+                    0% {
+                        transform: translateY(-100px) translateX(0) rotate(20deg);
+                        opacity: 0;
+                    }
+                    10% {
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateY(1000px) translateX(-1000px) rotate(20deg);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(meteorStyle);
+        }
+
+        // Inisialisasi halaman saat dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Buat bintang dan meteor
+            createStars();
+            createMeteors();
+            
+            // Efek tambahan untuk gambar profil
+            const profileImage = document.querySelector('.profile-image');
+            profileImage.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1)';
+                this.style.boxShadow = '0 0 5px rgba(108, 99, 255, 0.8)';
+            });
+            
+            profileImage.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = '0 0 3px rgba(108, 99, 255, 0.5)';
+            });
+            
+            // Efek kilat pada tombol saat dihover
+            document.querySelectorAll('.link-item').forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    const icon = this.querySelector('.link-icon');
+                    icon.style.transform = 'scale(1.1)';
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    const icon = this.querySelector('.link-icon');
+                    icon.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
