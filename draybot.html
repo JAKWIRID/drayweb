@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dray-Bot - Tutorial</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0a0e17;
+            --secondary-color: #0f1525;
+            --accent-color: #00eeff;
+            --accent-dark: #0099ff;
+            --text-color: #e0f7ff;
+            --text-muted: #8fa8b5;
+            --card-bg: rgba(15, 25, 45, 0.7);
+            --card-border: rgba(0, 238, 255, 0.2);
+            --shadow-color: rgba(0, 150, 255, 0.15);
+            --transition: all 0.3s ease;
+            --border-radius: 16px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        
+        /* Background dengan animasi */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(-40px) translateX(-10px); }
+            75% { transform: translateY(-20px) translateX(-5px); }
+            100% { transform: translateY(0) translateX(0); }
+        }
+        
+        /* Container utama */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Header */
+        header {
+            text-align: center;
+            padding: 20px 0 30px;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-color);
+        }
+        
+        .logo-text {
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-dark));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            font-weight: 300;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        /* Tutorial pilihan */
+        .tutorials-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .tutorials-header {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            position: relative;
+            display: inline-block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .tutorials-header::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-dark));
+            border-radius: 2px;
+        }
+        
+        .tutorials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .tutorial-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .tutorial-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px var(--shadow-color);
+            border-color: var(--accent-color);
+        }
+        
+        .tutorial-icon {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+            text-shadow: 0 0 15px var(--accent-color);
+        }
+        
+        .tutorial-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+        
+        .tutorial-description {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+        
+        .tutorial-btn {
+            background: linear-gradient(90deg, var(--accent-dark), var(--accent-color));
+            color: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        .tutorial-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+        
+        /* Konten tutorial (halaman detail) */
+        .tutorial-content {
+            display: none;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-top: 20px;
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tutorial-content.active {
+            display: block;
+        }
+        
+        .tutorial-content-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 238, 255, 0.2);
+        }
+        
+        .back-btn {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-btn:hover {
+            background: rgba(0, 238, 255, 0.1);
+        }
+        
+        .content-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-color);
+            text-align: center;
+            flex-grow: 1;
+        }
+        
+        .tutorial-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(10, 20, 40, 0.5);
+            border-left: 4px solid var(--accent-color);
+            transition: var(--transition);
+        }
+        
+        .step:hover {
+            background: rgba(15, 30, 60, 0.7);
+            transform: translateX(5px);
+        }
+        
+        .step-number {
+            background: linear-gradient(90deg, var(--accent-dark), var(--accent-color));
+            color: var(--primary-color);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .step-text {
+            color: var(--text-color);
+        }
+        
+        .step-text strong {
+            color: var(--accent-color);
+        }
+        
+        .step-text a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px dashed var(--accent-color);
+            transition: var(--transition);
+        }
+        
+        .step-text a:hover {
+            border-bottom: 1px solid var(--accent-color);
+        }
+        
+        .note {
+            background: rgba(255, 100, 100, 0.1);
+            border-left: 4px solid #ff5555;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            color: #ffaaaa;
+        }
+        
+        .contact {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 238, 255, 0.2);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .contact a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 30px;
+        }
+        
+        /* Responsif */
+        @media (max-width: 768px) {
+            .tutorials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .tutorial-content {
+                padding: 20px;
+            }
+            
+            .content-title {
+                font-size: 1.5rem;
+            }
+            
+            .tutorials-header {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .tutorial-card {
+                padding: 20px;
+            }
+            
+            .tutorial-content-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .back-btn {
+                align-self: flex-start;
+            }
+            
+            .step {
+                padding: 12px;
+            }
+        }
+        
+        /* Efek loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 238, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background dengan partikel animasi -->
+    <div class="background-animation" id="particles-container"></div>
+    
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <span class="logo-text">Dray Tutorials</span>
+            </div>
+            <p class="subtitle">Panduan lengkap untuk menggunakan layanan bot Dray Store</p>
+        </header>
+        
+        <!-- Tutorial Pilihan -->
+        <div class="tutorials-container" id="tutorials-list">
+            <h2 class="tutorials-header">PILIHAN TUTOR</h2>
+            <div class="tutorials-grid">
+                <!-- Tutorial Buy Nokos -->
+                <div class="tutorial-card" data-tutorial="nokos">
+                    <div class="tutorial-icon">
+                        <i class="fas fa-sim-card"></i>
+                    </div>
+                    <h3 class="tutorial-title">TUTOR BUY NOKOS</h3>
+                    <p class="tutorial-description">Panduan lengkap untuk membeli nomor kosong (NOKOS) melalui bot Dray Store</p>
+                    <button class="tutorial-btn">Lihat Tutorial</button>
+                </div>
+                
+                <!-- Tutorial Buy Panel Pterodactyl -->
+                <div class="tutorial-card" data-tutorial="panel">
+                    <div class="tutorial-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3 class="tutorial-title">TUTOR BUY PANEL PTERODACTYL</h3>
+                    <p class="tutorial-description">Panduan lengkap untuk membeli panel Pterodactyl melalui bot Dray Store</p>
+                    <button class="tutorial-btn">Lihat Tutorial</button>
+                </div>
+                
+                <!-- Tutorial Buy APK Bug -->
+                <div class="tutorial-card" data-tutorial="apk">
+                    <div class="tutorial-icon">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <h3 class="tutorial-title">TUTOR BUY APK BUG</h3>
+                    <p class="tutorial-description">Panduan lengkap untuk membeli aplikasi bug melalui bot Dray Store</p>
+                    <button class="tutorial-btn">Lihat Tutorial</button>
+                </div>
+                
+                <!-- Tutorial Buy VPS -->
+                <div class="tutorial-card" data-tutorial="vps">
+                    <div class="tutorial-icon">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <h3 class="tutorial-title">TUTOR BUY VPS</h3>
+                    <p class="tutorial-description">Panduan lengkap untuk membeli VPS Digital Ocean melalui bot Dray Store</p>
+                    <button class="tutorial-btn">Lihat Tutorial</button>
+                </div>
+                
+                <!-- Tutorial Buy Script -->
+                <div class="tutorial-card" data-tutorial="script">
+                    <div class="tutorial-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="tutorial-title">TUTOR BUY SCRIPT</h3>
+                    <p class="tutorial-description">Panduan lengkap untuk membeli script melalui bot Dray Store</p>
+                    <button class="tutorial-btn">Lihat Tutorial</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Konten Tutorial (Akan ditampilkan saat tutorial dipilih) -->
+        <div id="tutorial-content-container">
+            <!-- Konten untuk Tutorial NOKOS -->
+            <div class="tutorial-content" id="tutorial-nokos">
+                <div class="tutorial-content-header">
+                    <button class="back-btn" onclick="showTutorialList()">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
+                    <h2 class="content-title">TUTORIAL ORDER NOKOS</h2>
+                    <div style="width: 100px;"></div> <!-- Spacer untuk alignment -->
+                </div>
+                
+                <div class="tutorial-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Buka bot telegram <a href="https://t.me/draystorebot" target="_blank">Dray Store</a></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Start bot Dray Store</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Pilih <strong>Shop</strong></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Pilih <strong>Buy Nokos</strong></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-text">Top Up Saldo atau deposit terlebih dahulu sebelum membeli</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">6</div>
+                        <div class="step-text">Pilih aplikasi (Whatsapp/Telegram/dll)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">7</div>
+                        <div class="step-text">Pilih Negara nokos (Indonesia/Malaysia/Dll)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">8</div>
+                        <div class="step-text">Pilih Harga (Jika stock habis ganti ke harga yang lain)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">9</div>
+                        <div class="step-text">Pilih Operator: <strong>INDOSAT AXIS TELKOMSEL THREE SMARTFREN BYU</strong><br>ANY = Random Operator</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">10</div>
+                        <div class="step-text">Klik <strong>Cek SMS OTP</strong> untuk melihat kode otp/status otp</div>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    <strong>Catatan:</strong> Jika OTP belum masuk lebih dari 5 Menit mohon batalkan transaksi
+                </div>
+                
+                <div class="contact">
+                    Ada masalah? hubungi <a href="https://t.me/drayoffc" target="_blank">@Dray</a>
+                </div>
+            </div>
+            
+            <!-- Konten untuk Tutorial Panel -->
+            <div class="tutorial-content" id="tutorial-panel">
+                <div class="tutorial-content-header">
+                    <button class="back-btn" onclick="showTutorialList()">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
+                    <h2 class="content-title">TUTORIAL ORDER PANEL PTERODACTYL</h2>
+                    <div style="width: 100px;"></div>
+                </div>
+                
+                <div class="tutorial-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Buka bot telegram <a href="https://t.me/draystorebot" target="_blank">Dray Store</a></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Start bot Dray Store</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Pilih <strong>Shop</strong></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Pilih <strong>Panel Pterodactyl</strong></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-text">Kirim username untuk dijadikan akun panel Pterodactyl</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">6</div>
+                        <div class="step-text">Pilih <strong>Ram Panel</strong><br>Unlimited = Penyimpanan tak terbatas</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">7</div>
+                        <div class="step-text">Scan Qris untuk membayar pembelian panel</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">8</div>
+                        <div class="step-text">Status pembayaran kamu akan dicek bot secara otomatis</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">9</div>
+                        <div class="step-text">Jika pembayaran berhasil bot akan mengirimkan data panel sesuai orderan kamu</div>
+                    </div>
+                </div>
+                
+                <div class="contact">
+                    Jika ada kendala? hubungi <a href="https://t.me/drayoffc" target="_blank">@Dray</a>
+                </div>
+            </div>
+            
+            <!-- Konten untuk Tutorial APK Bug -->
+            <div class="tutorial-content" id="tutorial-apk">
+                <div class="tutorial-content-header">
+                    <button class="back-btn" onclick="showTutorialList()">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
+                    <h2 class="content-title">TUTORIAL ORDER APK BUG</h2>
+                    <div style="width: 100px;"></div>
+                </div>
+                
+                <div class="tutorial-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Buka bot telegram <a href="https://t.me/draystorebot" target="_blank">Dray Store</a></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Start bot Dray Store</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Pilih <strong>Shop</strong></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Pilih <strong>Order aplikasi bug</strong></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-text">Pilih Aplikasi (Zeno/Another/Aishiteru/dll)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">6</div>
+                        <div class="step-text">Pilih Masa aktif (Seminggu, Sebulan, Permanen)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">7</div>
+                        <div class="step-text">Kirim username untuk dijadikan akun apk bug</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">8</div>
+                        <div class="step-text">Scan Qris untuk membayar pembelian apk bug</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">9</div>
+                        <div class="step-text">Status pembayaran kamu akan dicek bot secara otomatis</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">10</div>
+                        <div class="step-text">Jika pembayaran berhasil bot akan mengirimkan data akun sesuai orderan kamu</div>
+                    </div>
+                </div>
+                
+                <div class="contact">
+                    Jika ada kendala? hubungi <a href="https://t.me/drayoffc" target="_blank">@Dray</a>
+                </div>
+            </div>
+            
+            <!-- Konten untuk Tutorial VPS -->
+            <div class="tutorial-content" id="tutorial-vps">
+                <div class="tutorial-content-header">
+                    <button class="back-btn" onclick="showTutorialList()">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
+                    <h2 class="content-title">TUTORIAL ORDER VPS</h2>
+                    <div style="width: 100px;"></div>
+                </div>
+                
+                <div class="tutorial-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Buka bot telegram <a href="https://t.me/draystorebot" target="_blank">Dray Store</a></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Start bot Dray Store</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Pilih <strong>Shop</strong></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Pilih <strong>VPS DIGITAL OCEAN</strong></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-text">Pilih Kategori Vps:<br>
+                        <strong>Low Vps</strong> = Vps dengan kualitas terendah<br>
+                        <strong>Medium Vps</strong> = Vps dengan kualitas medium<br>
+                        <strong>High Vps</strong> = Vps dengan kualitas high</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">6</div>
+                        <div class="step-text">Pilih Ram dan Cpu Vps</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">7</div>
+                        <div class="step-text">Pilih OS (ubuntu/debian/Fedora/dll)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">8</div>
+                        <div class="step-text">Pilih Versi OS</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">9</div>
+                        <div class="step-text">Pilih Region (Singapore/new York/dll)</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">10</div>
+                        <div class="step-text">Pilih Bayar otomatis</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">11</div>
+                        <div class="step-text">Scan qris yang telah dibuat oleh bot</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">12</div>
+                        <div class="step-text">Status pembayaran kamu akan dicek bot secara otomatis</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">13</div>
+                        <div class="step-text">Jika pembayaran berhasil bot akan mengirimkan data vps sesuai orderan kamu</div>
+                    </div>
+                </div>
+                
+                <div class="contact">
+                    Jika ada kendala? hubungi <a href="https://t.me/drayoffc" target="_blank">@Dray</a>
+                </div>
+            </div>
+            
+            <!-- Konten untuk Tutorial Script -->
+            <div class="tutorial-content" id="tutorial-script">
+                <div class="tutorial-content-header">
+                    <button class="back-btn" onclick="showTutorialList()">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
+                    <h2 class="content-title">TUTORIAL ORDER SCRIPT</h2>
+                    <div style="width: 100px;"></div>
+                </div>
+                
+                <div class="tutorial-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">Buka bot telegram <a href="https://t.me/draystorebot" target="_blank">Dray Store</a></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">Start bot Dray Store</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">Pilih <strong>Shop</strong></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-text">Pilih <strong>Script</strong></div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-text">Pilih jenis script yang ingin kamu beli</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">6</div>
+                        <div class="step-text">Scan Qris untuk membayar pembelian script</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">7</div>
+                        <div class="step-text">Status pembayaran kamu akan dicek bot secara otomatis</div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">8</div>
+                        <div class="step-text">Jika pembayaran berhasil bot akan mengirimkan file script sesuai orderan kamu</div>
+                    </div>
+                </div>
+                
+                <div class="contact">
+                    Jika ada kendala? hubungi <a href="https://t.me/drayoffc" target="_blank">@Dray</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2026 Dray Official - All rights reserved.</p>
+            <p>Designed with <i class="fas fa-heart" style="color: #ff5555;"></i> for Dray Store Bot</p>
+        </footer>
+    </div>
+
+    <script>
+        // Inisialisasi partikel animasi
+        function initParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 25;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Ukuran acak
+                const size = Math.random() * 150 + 50;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Posisi acak
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Animasi dengan delay acak
+                particle.style.animationDelay = `${Math.random() * 20}s`;
+                particle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // Fungsi untuk menampilkan konten tutorial
+        function showTutorial(tutorialId) {
+            // Sembunyikan daftar tutorial
+            document.getElementById('tutorials-list').style.display = 'none';
+            
+            // Sembunyikan semua konten tutorial
+            const allContents = document.querySelectorAll('.tutorial-content');
+            allContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Tampilkan konten tutorial yang dipilih
+            const selectedContent = document.getElementById(`tutorial-${tutorialId}`);
+            selectedContent.classList.add('active');
+            
+            // Scroll ke atas
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Fungsi untuk kembali ke daftar tutorial
+        function showTutorialList() {
+            // Tampilkan daftar tutorial
+            document.getElementById('tutorials-list').style.display = 'block';
+            
+            // Sembunyikan semua konten tutorial
+            const allContents = document.querySelectorAll('.tutorial-content');
+            allContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Scroll ke atas
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Tambahkan event listener ke kartu tutorial
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi partikel
+            initParticles();
+            
+            // Tambahkan event listener untuk setiap kartu tutorial
+            const tutorialCards = document.querySelectorAll('.tutorial-card');
+            tutorialCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const tutorialId = this.getAttribute('data-tutorial');
+                    showTutorial(tutorialId);
+                });
+            });
+            
+            // Juga tambahkan event listener untuk tombol dalam kartu
+            const tutorialButtons = document.querySelectorAll('.tutorial-btn');
+            tutorialButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const card = this.closest('.tutorial-card');
+                    const tutorialId = card.getAttribute('data-tutorial');
+                    showTutorial(tutorialId);
+                });
+            });
+            
+            // Atur ukuran partikel saat resize window
+            window.addEventListener('resize', function() {
+                // Untuk responsive, kita bisa menyesuaikan jumlah partikel di sini jika diperlukan
+            });
+        });
+        
+        // Mencegah zoom pada iOS dengan double tap
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+        
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+    </script>
+</body>
+</html>
