@@ -455,7 +455,7 @@
         // === FUNGSI DARI payment.js YANG DIPERLUKAN ===
         const ATL_BASE = "https://atlantich2h.com";
         const APIGATEWAY_ORKUT = "https://api-ralzz.vercel.app/orderkuota";
-        
+        const apiAtlanticlur = "EkgNXh2PlJLn0ARMN5kZoM1mYZHm0ZzubUIDLblzNC3vVRMtfZMVoN8HjUSN1UF67XoxKsrEYTrhOM9N7rUrLJFJQ5yvtqh1QigU"
         // Konfigurasi API Atlantic (gunakan yang ada di payment.js)
         const paymentConfig = {
             method: "atlantic",
@@ -507,7 +507,7 @@
                 await axios.post(
                     `${ATL_BASE}/deposit/instant`,
                     new URLSearchParams({
-                        api_key: config.apiAtlantic,
+                        api_key: apiAtlanticlur,
                         id: String(id),
                         action: 'true'
                     }),
@@ -526,7 +526,7 @@
             try {
                 const reffId = generateReffId();
                 const body = {
-                    api_key: config.apiAtlantic,
+                    api_key: apiAtlanticlur,
                     reff_id: reffId,
                     nominal: amount,
                     type: "ewallet",
@@ -566,7 +566,7 @@
                 const res = await axios.post(
                     `${ATL_BASE}/deposit/status`,
                     new URLSearchParams({
-                        api_key: config.apiAtlantic,
+                        api_key: apiAtlanticlur,
                         id: String(id),
                     }),
                     {
