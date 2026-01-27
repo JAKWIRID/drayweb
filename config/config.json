@@ -1,0 +1,15 @@
+{
+  "payment": {
+    "method": "atlantic",
+    "apiAtlantic": "EkgNXh2PlJLn0ARMN5kZoM1mYZHm0ZzubUIDLblzNC3vVRMtfZMVoN8HjUSN1UF67XoxKsrEYTrhOM9N7rUrLJFJQ5yvtqh1QigU"
+  },
+  "pricing": {
+    "pricePerCoin": 100,
+    "minAmount": 10,
+    "maxAmount": 10000
+  },
+  "contact": {
+    "telegram": "@drayoffc",
+    "whatsapp": "6283151568511"
+  }
+}
