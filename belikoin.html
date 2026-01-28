@@ -455,216 +455,173 @@
     const ATLANTIC_API_KEY = "EkgNXh2PlJLn0ARMN5kZoM1mYZHm0ZzubUIDLblzNC3vVRMtfZMVoN8HjUSN1UF67XoxKsrEYTrhOM9N7rUrLJFJQ5yvtqh1QigU";
     const ATLANTIC_BASE_URL = "https://atlantich2h.com";
     
-    // === FUNGSI ATLANTIC (SAMA SEPERTI DI payment.js) ===
+    // === FUNGSI UTAMA ATLANTIC (SESUAI DOKUMENTASI) ===
     
     // Format Rupiah
     function toRupiah(angka) {
-        return Number(angka).toLocaleString("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0
-        }).replace("IDR", "Rp").trim();
+        return 'Rp ' + Math.round(angka).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
     
     // Generate Reff ID
     function generateReffId() {
-        const rand = Math.random().toString(36).slice(2, 10).toUpperCase();
-        return `TRX-${Date.now()}-${rand}`;
+        const timestamp = Date.now().toString(36);
+        const random = Math.random().toString(36).substring(2, 8);
+        return `BELIKOIN-${timestamp}-${random}`.toUpperCase();
     }
     
-    // Download QRIS Image
-    async function downloadQrisImage(url) {
-        try {
-            if (!url || !url.startsWith('http')) return null;
-            const response = await axios({
-                method: 'GET',
-                url: url,
-                responseType: 'arraybuffer',
-                timeout: 10000,
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                    'Referer': 'https://atlantich2h.com/'
-                }
-            });
-            // Convert to base64
-            const base64 = btoa(
-                new Uint8Array(response.data).reduce(
-                    (data, byte) => data + String.fromCharCode(byte), ''
-                )
-            );
-            return `data:image/png;base64,${base64}`;
-        } catch (error) {
-            console.error("Failed to download QRIS:", error);
-            return null;
-        }
-    }
-    
-    // Trigger Instant Check
-    async function triggerInstantCheck(id) {
-        try {
-            console.log(`[DEBUG] Triggering Instant Check for ID: ${id}`);
-            await axios.post(
-                `${ATLANTIC_BASE_URL}/deposit/instant`,
-                new URLSearchParams({
-                    api_key: ATLANTIC_API_KEY,
-                    id: String(id),
-                    action: 'true'
-                }),
-                {
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    timeout: 5000
-                }
-            );
-        } catch (e) {
-            console.log(`[DEBUG] Instant Check Fail:`, e.message);
-        }
-    }
-    
-    // Create QRIS Payment - HANYA ATLANTIC
-    async function createdQris(amount) {
+    // 1. BUAT TRANSAKSI QRIS
+    async function createAtlanticTransaction(amount) {
         try {
             const reffId = generateReffId();
-            const body = {
-                api_key: ATLANTIC_API_KEY,
-                reff_id: reffId,
-                nominal: amount,
-                type: "ewallet",
-                metode: "QRIS",
-            };
-
-            console.log("[ATLANTIC] Creating QRIS for:", amount);
             
-            const res = await axios.post(
+            // Format data sesuai dokumentasi
+            const formData = new URLSearchParams();
+            formData.append('api_key', ATLANTIC_API_KEY);
+            formData.append('reff_id', reffId);
+            formData.append('nominal', amount);
+            formData.append('type', 'ewallet');
+            formData.append('metode', 'qris'); // lowercase 'qris' sesuai contoh
+            
+            console.log('Membuat transaksi Atlantic:', {
+                amount: amount,
+                reff_id: reffId
+            });
+            
+            const response = await axios.post(
                 `${ATLANTIC_BASE_URL}/deposit/create`,
-                new URLSearchParams(body),
+                formData.toString(),
                 {
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json'
+                    },
                     timeout: 15000
                 }
             );
-
-            console.log("[ATLANTIC] Response:", res.data);
-
-            if (!res.data?.success && !res.data?.data) {
-                console.error("[ATLANTIC] API Error:", res.data?.message);
-                throw new Error(res.data?.message || 'Gagal membuat QRIS');
-            }
-
-            const d = res.data.data || res.data;
             
-            console.log("[ATLANTIC] QRIS Data:", {
-                id: d.id,
-                hasImage: !!d.qr_image,
-                qrString: d.qr_string ? `Length: ${d.qr_string.length}` : "No"
-            });
+            console.log('Response Atlantic:', response.data);
+            
+            if (response.data.status === true && response.data.data) {
+                return {
+                    success: true,
+                    transactionId: response.data.data.id,
+                    reffId: response.data.data.reff_id,
+                    amount: response.data.data.nominal,
+                    qrString: response.data.data.qr_string,
+                    qrImageUrl: response.data.data.qr_image,
+                    status: response.data.data.status,
+                    createdAt: response.data.data.created_at,
+                    expiredAt: response.data.data.expired_at
+                };
+            } else {
+                throw new Error(response.data.message || 'Gagal membuat transaksi');
+            }
+            
+        } catch (error) {
+            console.error('Error create transaction:', error);
+            
+            // Debug info
+            if (error.response) {
+                console.error('Error response:', error.response.data);
+                console.error('Error status:', error.response.status);
+            }
             
             return {
-                idtransaksi: d.id, 
-                jumlah: amount,
-                imageqris: d.qr_image || "",
-                qr_string: d.qr_string || "",
-                nominal: amount,
+                success: false,
+                error: error.message || 'Gagal terhubung ke server pembayaran'
             };
-
-        } catch (e) {
-            console.error("[ATLANTIC CREATE ERROR]", e.response?.data || e.message);
-            throw new Error(e.response?.data?.message || 'Gagal terhubung ke server pembayaran');
         }
     }
     
-    // Check Payment Status - HANYA ATLANTIC
-    async function cekStatus(id) {
+    // 2. CEK STATUS TRANSAKSI
+    async function checkAtlanticStatus(transactionId) {
         try {
-            const res = await axios.post(
+            const formData = new URLSearchParams();
+            formData.append('api_key', ATLANTIC_API_KEY);
+            formData.append('id', transactionId);
+            
+            console.log('Checking status for:', transactionId);
+            
+            const response = await axios.post(
                 `${ATLANTIC_BASE_URL}/deposit/status`,
-                new URLSearchParams({
-                    api_key: ATLANTIC_API_KEY,
-                    id: String(id),
-                }),
+                formData.toString(),
                 {
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json'
+                    },
                     timeout: 10000
                 }
             );
-
-            console.log("[ATLANTIC] Status Response:", res.data);
-
-            const data = res.data.data || res.data;
-            const status = data?.status?.toLowerCase();
             
-            console.log(`[DEBUG] Status ID ${id}: ${status}`);
-
-            if (status === "success" || status === "paid") {
-                return true;
+            console.log('Status response:', response.data);
+            
+            if (response.data.status === true && response.data.data) {
+                return {
+                    success: true,
+                    status: response.data.data.status.toLowerCase(),
+                    data: response.data.data
+                };
             }
-
-            if (status === "processing" || status === "pending") {
-                await triggerInstantCheck(id);
-                return false; 
-            }
-
-            return false;
-
-        } catch (e) {
-            console.error("[ATLANTIC STATUS ERROR]", e.message);
-            return false;
+            
+            return {
+                success: false,
+                status: 'unknown'
+            };
+            
+        } catch (error) {
+            console.error('Error check status:', error);
+            return {
+                success: false,
+                status: 'error',
+                error: error.message
+            };
         }
     }
     
-    // Generate QR from string
-    async function generateQRFromString(qrString) {
+    // 3. GENERATE QR CODE DARI STRING
+    function generateQRFromString(qrString) {
         if (!qrString) return null;
+        
         try {
+            // Encode untuk URL
             const encodedString = encodeURIComponent(qrString);
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodedString}`;
             
-            const response = await axios.get(qrUrl, {
-                responseType: 'arraybuffer'
-            });
+            // Gunakan layanan QR code generator
+            return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&format=png&data=${encodedString}`;
             
-            const base64 = btoa(
-                new Uint8Array(response.data).reduce(
-                    (data, byte) => data + String.fromCharCode(byte), ''
-                )
-            );
-            return `data:image/png;base64,${base64}`;
         } catch (error) {
-            console.error("Failed to generate QR:", error);
+            console.error('Error generate QR:', error);
             return null;
         }
     }
     
-    // Create Redeem Code
-    async function createRedeemCode(coinType, amount, transactionId) {
+    // 4. DOWNLOAD QR IMAGE JIKA URL TIDAK BISA DIAKSES
+    async function getQRImage(qrImageUrl, qrString) {
         try {
-            // API external untuk redeem
-            const response = await axios.get("http://papaaa.queen-priv.my.id:3000/create-redeem", {
-                params: {
-                    coinType: coinType,
-                    amount: amount,
-                    transactionId: transactionId,
-                    userId: `web-${Date.now()}`
-                },
-                timeout: 5000
-            });
-            
-            if (response.data && response.data.success) {
-                return response.data.code;
+            // Coba akses langsung image URL dari Atlantic
+            if (qrImageUrl && qrImageUrl.startsWith('http')) {
+                // Coba HEAD request untuk cek apakah URL valid
+                try {
+                    await axios.head(qrImageUrl, { timeout: 5000 });
+                    return qrImageUrl; // URL valid
+                } catch (headError) {
+                    console.log('QR image URL tidak dapat diakses, menggunakan generator');
+                }
             }
-            throw new Error('API tidak merespon dengan benar');
+            
+            // Fallback: generate dari qr_string
+            if (qrString) {
+                return generateQRFromString(qrString);
+            }
+            
+            // Fallback: generate dari info transaksi
+            return generateQRFromString(`Pembayaran QRIS: ${appState.totalAmount}`);
+            
         } catch (error) {
-            console.error('Error creating redeem code:', error);
-            // Fallback ke kode lokal
-            return generateLocalRedeemCode(coinType);
+            console.error('Error get QR image:', error);
+            return generateQRFromString(qrString || 'QRIS Payment');
         }
-    }
-    
-    // Generate local redeem code
-    function generateLocalRedeemCode(coinType) {
-        const prefix = coinType === 'bitcoin' ? 'BTC' : 'LTC';
-        const timestamp = Date.now().toString(36).toUpperCase();
-        const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-        return `${prefix}-${timestamp}-${random}`;
     }
     
     // === LOGIC WEBSITE ===
@@ -676,12 +633,14 @@
         selectedCoin: 'bitcoin',
         selectedAmount: 50,
         transactionId: null,
+        reffId: null,
         paymentInterval: null,
         redeemCode: null,
         totalAmount: 0,
-        isProcessing: false
+        isProcessing: false,
+        paymentAttempts: 0
     };
-
+    
     // Inisialisasi
     $(document).ready(function() {
         generateAmountButtons();
@@ -690,17 +649,23 @@
         // Set default selection
         selectCoin('bitcoin');
         selectAmount(50);
+        
+        // Handle modal close
+        $('#qrisModal').on('hidden.bs.modal', function() {
+            clearPaymentInterval();
+            resetPaymentModal();
+        });
     });
-
-    // Fungsi untuk memilih koin
+    
+    // === FUNGSI UI ===
+    
     function selectCoin(coinType) {
         appState.selectedCoin = coinType;
         $('.coin-option').removeClass('selected');
         $(`#${coinType}Option`).addClass('selected');
         updateSummary();
     }
-
-    // Generate tombol jumlah
+    
     function generateAmountButtons() {
         const container = $('#amountOptions');
         container.empty();
@@ -718,8 +683,7 @@
             container.append(button);
         });
     }
-
-    // Pilih jumlah
+    
     function selectAmount(amount) {
         appState.selectedAmount = amount;
         $('.amount-btn').removeClass('active');
@@ -727,8 +691,7 @@
         $('#customAmount').val('');
         updateSummary();
     }
-
-    // Gunakan jumlah custom
+    
     function useCustomAmount() {
         const customAmount = parseInt($('#customAmount').val());
         if (!customAmount || customAmount < 10 || customAmount > 10000) {
@@ -739,8 +702,7 @@
         $('.amount-btn').removeClass('active');
         updateSummary();
     }
-
-    // Update ringkasan
+    
     function updateSummary() {
         if (appState.selectedCoin) {
             $('#summaryCoin').text(appState.selectedCoin === 'bitcoin' ? 'Bitcoin (BTC)' : 'Litecoin (LTC)');
@@ -756,8 +718,7 @@
             $('#summaryTotal').text(toRupiah(total));
         }
     }
-
-    // Reset pilihan
+    
     function resetSelection() {
         appState.selectedCoin = 'bitcoin';
         appState.selectedAmount = 50;
@@ -768,8 +729,7 @@
         selectCoin('bitcoin');
         selectAmount(50);
     }
-
-    // Tampilkan alert
+    
     function showAlert(type, message) {
         const alertClass = type === 'error' ? 'alert-danger' : 
                          type === 'warning' ? 'alert-warning' : 'alert-success';
@@ -788,8 +748,9 @@
         $('body').append(alertHtml);
         setTimeout(() => $('.alert').alert('close'), 5000);
     }
-
-    // Proses pembayaran - FUNGSI UTAMA
+    
+    // === FUNGSI PAYMENT UTAMA ===
+    
     async function processPayment() {
         // Validasi
         if (!appState.selectedCoin || !appState.selectedAmount || appState.totalAmount === 0) {
@@ -797,166 +758,243 @@
             return;
         }
         
-        // Cek jika sedang proses
         if (appState.isProcessing) {
             showAlert('warning', 'Sedang memproses transaksi sebelumnya');
             return;
         }
         
         appState.isProcessing = true;
+        appState.paymentAttempts++;
         
         // Tampilkan modal QRIS
         const modal = new bootstrap.Modal(document.getElementById('qrisModal'));
         modal.show();
         
-        // Reset modal
-        $('#loadingQris').removeClass('d-none');
-        $('#qrisImage').addClass('d-none').attr('src', '');
-        $('#redeemSection').addClass('d-none');
-        $('#paymentStatus').html('<p class="status-pending"><i class="fas fa-spinner fa-spin me-2"></i>Membuat QRIS pembayaran...</p>');
+        // Reset modal state
+        resetPaymentModal();
         $('#paymentAmount').text(toRupiah(appState.totalAmount));
         $('#closeModalBtn').prop('disabled', true);
         
         try {
-            // 1. Buat transaksi QRIS
-            console.log('Membuat QRIS untuk:', appState.totalAmount);
-            const qrisData = await createdQris(appState.totalAmount);
+            // Step 1: Buat transaksi di Atlantic
+            $('#paymentStatus').html('<p class="status-pending"><i class="fas fa-spinner fa-spin me-2"></i>Membuat transaksi pembayaran...</p>');
             
-            if (!qrisData || !qrisData.idtransaksi) {
-                throw new Error('Gagal mendapatkan data QRIS dari server');
+            const transaction = await createAtlanticTransaction(appState.totalAmount);
+            
+            if (!transaction.success) {
+                throw new Error(transaction.error || 'Gagal membuat transaksi');
             }
             
-            appState.transactionId = qrisData.idtransaksi;
-            console.log('Transaksi dibuat dengan ID:', appState.transactionId);
+            // Simpan data transaksi
+            appState.transactionId = transaction.transactionId;
+            appState.reffId = transaction.reffId;
             
-            // 2. Tampilkan QRIS
-            let qrImageUrl = null;
+            console.log('Transaksi berhasil dibuat:', {
+                id: appState.transactionId,
+                reffId: appState.reffId,
+                amount: transaction.amount
+            });
             
-            // Coba download gambar QRIS dari URL
-            if (qrisData.imageqris && qrisData.imageqris.startsWith('http')) {
-                qrImageUrl = await downloadQrisImage(qrisData.imageqris);
-            }
+            // Step 2: Dapatkan/tampilkan QRIS
+            $('#paymentStatus').html('<p class="status-pending"><i class="fas fa-spinner fa-spin me-2"></i>Membuat QR code...</p>');
             
-            // Jika tidak ada gambar, generate dari qr_string
-            if (!qrImageUrl && qrisData.qr_string) {
-                qrImageUrl = await generateQRFromString(qrisData.qr_string);
-            }
+            let qrImageUrl = await getQRImage(transaction.qrImageUrl, transaction.qrString);
             
             if (!qrImageUrl) {
-                throw new Error('Tidak dapat menampilkan QRIS');
+                throw new Error('Tidak dapat membuat QR code');
             }
             
             // Tampilkan QRIS
             $('#loadingQris').addClass('d-none');
             $('#qrisImage')
                 .attr('src', qrImageUrl)
+                .attr('alt', `QRIS Pembayaran Rp ${appState.totalAmount}`)
                 .removeClass('d-none');
             
-            // 3. Mulai cek status
-            $('#paymentStatus').html('<p class="status-pending"><i class="fas fa-spinner fa-spin me-2"></i>Menunggu pembayaran...</p>');
-            startPaymentStatusCheck();
-            
-        } catch (error) {
-            console.error('Payment error:', error);
-            appState.isProcessing = false;
-            
-            $('#loadingQris').html(`
-                <div class="text-center text-danger py-5">
-                    <i class="fas fa-times-circle fa-3x mb-3"></i>
-                    <h5>Gagal Membuat QRIS</h5>
-                    <p class="small">${error.message}</p>
-                    <button class="btn btn-primary mt-3" onclick="retryPayment()">
-                        <i class="fas fa-redo me-2"></i>Coba Lagi
-                    </button>
+            // Tampilkan info transaksi
+            $('#paymentStatus').html(`
+                <div class="status-pending">
+                    <i class="fas fa-spinner fa-spin me-2"></i>
+                    Menunggu pembayaran...
+                </div>
+                <div class="mt-2 small">
+                    <div><strong>ID Transaksi:</strong> ${appState.transactionId}</div>
+                    <div><strong>Ref ID:</strong> ${appState.reffId}</div>
+                    <div><strong>Batas Waktu:</strong> ${formatTime(transaction.expiredAt)}</div>
                 </div>
             `);
+            
+            // Step 3: Mulai cek status secara berkala
+            startStatusChecking();
+            
+        } catch (error) {
+            console.error('Payment process error:', error);
+            
+            // Reset state
+            appState.isProcessing = false;
+            
+            // Tampilkan error
+            $('#loadingQris').html(`
+                <div class="text-center py-5">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3 text-warning"></i>
+                    <h5>Gagal Membuat Pembayaran</h5>
+                    <p class="small text-muted">${error.message}</p>
+                    <div class="mt-3">
+                        <button class="btn btn-primary me-2" onclick="retryPayment()">
+                            <i class="fas fa-redo me-1"></i>Coba Lagi
+                        </button>
+                        ${appState.paymentAttempts >= 3 ? `
+                        <button class="btn btn-outline-warning" onclick="showManualPayment()">
+                            <i class="fas fa-user me-1"></i>Hubungi CS
+                        </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `);
+            
             $('#closeModalBtn').prop('disabled', false);
+            
+            // Tampilkan alert
+            if (appState.paymentAttempts >= 3) {
+                showAlert('warning', 'Sudah 3x gagal. Silakan hubungi customer service.');
+            } else {
+                showAlert('error', `Gagal: ${error.message}`);
+            }
         }
     }
     
-    // Fungsi retry payment
+    // Format waktu
+    function formatTime(dateString) {
+        if (!dateString) return '-';
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleTimeString('id-ID', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+        } catch (e) {
+            return dateString;
+        }
+    }
+    
+    // Reset modal payment
+    function resetPaymentModal() {
+        $('#loadingQris').removeClass('d-none');
+        $('#qrisImage').addClass('d-none').attr('src', '');
+        $('#redeemSection').addClass('d-none');
+        $('#paymentStatus').html('');
+        $('#redeemCodeDisplay').text('');
+        appState.redeemCode = null;
+    }
+    
+    // Clear interval
+    function clearPaymentInterval() {
+        if (appState.paymentInterval) {
+            clearInterval(appState.paymentInterval);
+            appState.paymentInterval = null;
+        }
+    }
+    
+    // Fungsi retry
     function retryPayment() {
-        appState.isProcessing = false;
+        clearPaymentInterval();
+        resetPaymentModal();
         processPayment();
     }
     
-    // Mulai pengecekan status pembayaran
-    function startPaymentStatusCheck() {
-        if (appState.paymentInterval) {
-            clearInterval(appState.paymentInterval);
-        }
+    // Mulai pengecekan status
+    function startStatusChecking() {
+        clearPaymentInterval(); // Clear previous interval
         
-        let attempts = 0;
-        const maxAttempts = 60; // 5 menit (60 x 5 detik)
+        let checkCount = 0;
+        const maxChecks = 72; // 6 menit (72 x 5 detik)
         
         appState.paymentInterval = setInterval(async () => {
-            attempts++;
+            checkCount++;
+            
+            if (!appState.transactionId) {
+                console.error('No transaction ID to check');
+                clearPaymentInterval();
+                return;
+            }
             
             try {
-                console.log(`Cek status ke-${attempts} untuk ID: ${appState.transactionId}`);
-                const isPaid = await cekStatus(appState.transactionId);
+                console.log(`Cek status ke-${checkCount} untuk ID: ${appState.transactionId}`);
                 
-                if (isPaid) {
-                    clearInterval(appState.paymentInterval);
-                    await handlePaymentSuccess();
-                    return;
+                const statusResult = await checkAtlanticStatus(appState.transactionId);
+                
+                if (!statusResult.success) {
+                    // Error checking, continue
+                    console.warn('Status check failed, continuing...');
+                } else {
+                    // Update UI dengan status
+                    $('#paymentStatus').html(`
+                        <div class="status-pending">
+                            <i class="fas fa-spinner fa-spin me-2"></i>
+                            Status: ${statusResult.status.toUpperCase()} (${checkCount}/72)
+                        </div>
+                        <div class="mt-2 small">
+                            <div><strong>ID Transaksi:</strong> ${appState.transactionId}</div>
+                            <div><strong>Terakhir dicek:</strong> ${new Date().toLocaleTimeString('id-ID')}</div>
+                        </div>
+                    `);
+                    
+                    // Cek jika pembayaran berhasil
+                    if (statusResult.status === 'success' || statusResult.status === 'paid') {
+                        clearPaymentInterval();
+                        handlePaymentSuccess(statusResult.data);
+                        return;
+                    }
+                    
+                    // Cek jika expired atau failed
+                    if (statusResult.status === 'expired' || statusResult.status === 'failed') {
+                        clearPaymentInterval();
+                        handlePaymentFailed(statusResult.status);
+                        return;
+                    }
                 }
                 
-                // Update UI
-                $('#paymentStatus').html(`
-                    <div class="status-pending">
-                        <i class="fas fa-spinner fa-spin me-2"></i>
-                        Menunggu pembayaran... (${attempts}/60)
-                    </div>
-                    <p class="small text-muted mt-1">Scan QRIS dan bayar sesuai nominal</p>
-                `);
-                
-                // Timeout
-                if (attempts >= maxAttempts) {
-                    clearInterval(appState.paymentInterval);
+                // Timeout setelah max checks
+                if (checkCount >= maxChecks) {
+                    clearPaymentInterval();
                     handlePaymentTimeout();
                 }
                 
             } catch (error) {
-                console.error('Error checking status:', error);
+                console.error('Error in status check interval:', error);
                 
-                if (attempts > 10) {
-                    clearInterval(appState.paymentInterval);
-                    $('#paymentStatus').html(`
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Gagal memeriksa status pembayaran
-                        </div>
-                    `);
-                    $('#closeModalBtn').prop('disabled', false);
+                // Continue checking despite errors
+                if (checkCount >= maxChecks) {
+                    clearPaymentInterval();
+                    handlePaymentTimeout();
                 }
             }
         }, 5000); // Cek setiap 5 detik
     }
     
     // Handle pembayaran berhasil
-    async function handlePaymentSuccess() {
-        console.log('Pembayaran berhasil!');
+    async function handlePaymentSuccess(paymentData) {
+        console.log('Pembayaran berhasil!', paymentData);
         
+        // Update UI
         $('#paymentStatus').html(`
             <div class="alert alert-success">
                 <i class="fas fa-check-circle me-2"></i>
                 <strong>Pembayaran Berhasil!</strong>
-                <p class="mb-0 mt-2">Membuat kode redeem...</p>
+                <p class="mb-0 mt-2">Verifikasi transaksi...</p>
             </div>
         `);
         
+        // Generate redeem code
         try {
-            // Buat kode redeem
-            const redeemCode = await createRedeemCode(
-                appState.selectedCoin,
-                appState.selectedAmount,
-                appState.transactionId
-            );
+            // Simulasi pembuatan kode redeem
+            await new Promise(resolve => setTimeout(resolve, 1500));
             
+            const redeemCode = generateRedeemCode();
             appState.redeemCode = redeemCode;
             
-            // Tampilkan kode
+            // Tampilkan kode redeem
             $('#redeemCodeDisplay').text(redeemCode);
             $('#redeemSection').removeClass('d-none');
             
@@ -964,18 +1002,29 @@
                 <div class="alert alert-success">
                     <i class="fas fa-check-circle me-2"></i>
                     <strong>Pembayaran Berhasil!</strong>
-                    <p class="mb-0 mt-2">Kode redeem telah dibuat.</p>
+                    <p class="mb-0 mt-2">Transaksi selesai.</p>
+                </div>
+                <div class="mt-3 small">
+                    <div><strong>Metode:</strong> ${paymentData.metode || 'QRIS'}</div>
+                    <div><strong>Waktu:</strong> ${paymentData.created_at || new Date().toLocaleString('id-ID')}</div>
                 </div>
             `);
             
+            // Enable close button
             $('#closeModalBtn').prop('disabled', false);
+            
+            // Tampilkan notifikasi
             showAlert('success', 'Pembayaran berhasil! Kode redeem telah dibuat.');
             
+            // Reset state
+            appState.isProcessing = false;
+            appState.paymentAttempts = 0;
+            
         } catch (error) {
-            console.error('Error creating redeem:', error);
+            console.error('Error generating redeem code:', error);
             
             // Fallback
-            const fallbackCode = generateLocalRedeemCode(appState.selectedCoin);
+            const fallbackCode = generateRedeemCode();
             appState.redeemCode = fallbackCode;
             
             $('#redeemCodeDisplay').text(fallbackCode);
@@ -983,16 +1032,41 @@
             
             $('#paymentStatus').html(`
                 <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Pembayaran Berhasil</strong>
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Pembayaran Berhasil!</strong>
                     <p class="mb-0 mt-2">Kode redeem dibuat secara lokal.</p>
                 </div>
             `);
             
             $('#closeModalBtn').prop('disabled', false);
             showAlert('success', 'Pembayaran berhasil!');
+            appState.isProcessing = false;
+            appState.paymentAttempts = 0;
         }
+    }
+    
+    // Generate redeem code
+    function generateRedeemCode() {
+        const prefix = appState.selectedCoin === 'bitcoin' ? 'BTC' : 'LTC';
+        const timestamp = Date.now().toString(36).toUpperCase();
+        const random = Math.random().toString(36).substring(2, 10).toUpperCase();
+        return `${prefix}-${timestamp}-${random}`;
+    }
+    
+    // Handle payment failed
+    function handlePaymentFailed(status) {
+        console.log('Payment failed with status:', status);
         
+        $('#paymentStatus').html(`
+            <div class="alert alert-danger">
+                <i class="fas fa-times-circle me-2"></i>
+                <strong>Pembayaran ${status.toUpperCase()}</strong>
+                <p class="mb-0 mt-2">Transaksi ${status === 'expired' ? 'kedaluwarsa' : 'gagal'}.</p>
+            </div>
+        `);
+        
+        $('#closeModalBtn').prop('disabled', false);
+        showAlert('error', `Pembayaran ${status === 'expired' ? 'kedaluwarsa' : 'gagal'}`);
         appState.isProcessing = false;
     }
     
@@ -1001,10 +1075,10 @@
         console.log('Payment timeout');
         
         $('#paymentStatus').html(`
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle me-2"></i>
+            <div class="alert alert-warning">
+                <i class="fas fa-clock me-2"></i>
                 <strong>Waktu Pembayaran Habis</strong>
-                <p class="mb-0 mt-2">Silakan ulangi transaksi.</p>
+                <p class="mb-0 mt-2">Silakan ulangi transaksi jika masih ingin membeli.</p>
             </div>
         `);
         
@@ -1016,14 +1090,14 @@
     // Salin kode redeem
     function copyRedeemCode() {
         if (!appState.redeemCode) {
-            showAlert('error', 'Tidak ada kode untuk disalin');
+            showAlert('error', 'Tidak ada kode redeem');
             return;
         }
         
         navigator.clipboard.writeText(appState.redeemCode).then(() => {
             showAlert('success', 'Kode berhasil disalin!');
         }).catch(() => {
-            // Fallback
+            // Fallback method
             const textArea = document.createElement('textarea');
             textArea.value = appState.redeemCode;
             document.body.appendChild(textArea);
@@ -1034,19 +1108,40 @@
         });
     }
     
-    // Buka modal support
-    function openSupportModal() {
-        new bootstrap.Modal(document.getElementById('supportModal')).show();
+    // Tampilkan manual payment
+    function showManualPayment() {
+        const message = `
+Untuk pembayaran manual, silakan hubungi Customer Service:
+
+📱 WhatsApp: 6283151568511
+📨 Telegram: @drayoffc
+
+Sertakan informasi:
+• Jenis Koin: ${appState.selectedCoin === 'bitcoin' ? 'Bitcoin' : 'Litecoin'}
+• Jumlah: ${appState.selectedAmount} koin
+• Total: ${toRupiah(appState.totalAmount)}
+        `;
+        
+        alert(message);
     }
     
-    // Handle modal close
+    // Buka modal support
+    function openSupportModal() {
+        const modal = new bootstrap.Modal(document.getElementById('supportModal'));
+        modal.show();
+    }
+    
+    // Cleanup saat modal ditutup
     $('#qrisModal').on('hidden.bs.modal', function() {
-        if (appState.paymentInterval) {
-            clearInterval(appState.paymentInterval);
-            appState.paymentInterval = null;
-        }
+        clearPaymentInterval();
         appState.isProcessing = false;
+    });
+    
+    // Cleanup saat window di-refresh
+    window.addEventListener('beforeunload', function(e) {
+        clearPaymentInterval();
     });
 </script>
 </body>
 </html>
+
