@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Another - Topup & VIP Access</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            color: #f0f0f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Overlay Pilihan Awal */
+        #choiceOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 10, 0.98);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.8s ease;
+        }
+
+        .overlay-content {
+            text-align: center;
+            max-width: 800px;
+            padding: 30px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #9d00ff, #ff00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(157, 0, 255, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #aaa;
+            margin-bottom: 50px;
+            font-weight: 300;
+        }
+
+        .choice-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .choice-btn {
+            background: rgba(30, 30, 40, 0.8);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 25px 30px;
+            width: 300px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-10px);
+            border-color: #9d00ff;
+            box-shadow: 0 10px 25px rgba(157, 0, 255, 0.4);
+        }
+
+        .choice-btn i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #9d00ff;
+        }
+
+        .choice-btn h3 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .choice-btn p {
+            color: #bbb;
+            font-size: 0.95rem;
+        }
+
+        /* Konten Utama */
+        #mainContent {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(157, 0, 255, 0.3);
+            margin-bottom: 40px;
+        }
+
+        .header-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #9d00ff, #ff00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .back-btn {
+            background: rgba(157, 0, 255, 0.2);
+            border: 1px solid #9d00ff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: rgba(157, 0, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        /* Form Topup Coin */
+        .coin-option {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .coin-select {
+            background: rgba(30, 30, 40, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            width: 220px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .coin-select:hover {
+            transform: translateY(-5px);
+            border-color: #9d00ff;
+        }
+
+        .coin-select.active {
+            border-color: #9d00ff;
+            background: rgba(157, 0, 255, 0.1);
+            box-shadow: 0 5px 20px rgba(157, 0, 255, 0.3);
+        }
+
+        .coin-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .btc-icon {
+            color: #f7931a;
+        }
+
+        .ltc-icon {
+            color: #bebebe;
+        }
+
+        .coin-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .coin-price {
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        /* Input Jumlah Coin */
+        .coin-input-container {
+            background: rgba(30, 30, 40, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            color: #ddd;
+        }
+
+        .coin-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(10, 10, 15, 0.8);
+            border: 1px solid rgba(157, 0, 255, 0.5);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .coin-input:focus {
+            outline: none;
+            border-color: #9d00ff;
+            box-shadow: 0 0 10px rgba(157, 0, 255, 0.5);
+        }
+
+        .price-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        /* Struk Preview */
+        .receipt-preview {
+            background: rgba(30, 30, 40, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(157, 0, 255, 0.3);
+        }
+
+        .receipt-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #9d00ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .receipt-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-item {
+            padding: 15px;
+            background: rgba(10, 10, 15, 0.8);
+            border-radius: 10px;
+        }
+
+        .detail-label {
+            color: #bbb;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .total-price {
+            color: #9d00ff;
+            font-weight: 700;
+        }
+
+        /* Tombol Aksi */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 18px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            min-width: 200px;
+        }
+
+        .whatsapp-btn {
+            background: linear-gradient(90deg, #25D366, #128C7E);
+            color: white;
+        }
+
+        .telegram-btn {
+            background: linear-gradient(90deg, #0088cc, #005f8d);
+            color: white;
+        }
+
+        .topup-btn, .vip-btn {
+            background: linear-gradient(90deg, #9d00ff, #ff00ff);
+            color: white;
+            font-size: 1.2rem;
+            padding: 20px 40px;
+            margin-top: 20px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Tampilan VIP */
+        .vip-benefits {
+            background: rgba(30, 30, 40, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .benefits-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: #9d00ff;
+            text-align: center;
+        }
+
+        .benefits-list {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .benefits-list li {
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.1rem;
+        }
+
+        .benefits-list li:last-child {
+            border-bottom: none;
+        }
+
+        .benefits-list i {
+            color: #9d00ff;
+            font-size: 1.3rem;
+        }
+
+        /* Harga VIP */
+        .vip-pricing {
+            background: rgba(30, 30, 40, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 40px;
+            border: 2px solid #9d00ff;
+        }
+
+        .price-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #aaa;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .discounted-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #9d00ff;
+            margin-bottom: 15px;
+        }
+
+        .discount-badge {
+            display: inline-block;
+            background: #ff0000;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(157, 0, 255, 0.3);
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 50px;
+        }
+
+        .footer-info {
+            margin-bottom: 10px;
+        }
+
+        /* Animasi */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(157, 0, 255, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(157, 0, 255, 0.8);
+            }
+        }
+
+        /* Responsif */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            .choice-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .choice-btn {
+                width: 90%;
+                max-width: 300px;
+            }
+            
+            .coin-option {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .coin-select {
+                width: 90%;
+                max-width: 300px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 90%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay Pilihan Awal -->
+    <div id="choiceOverlay">
+        <div class="overlay-content">
+            <h1 class="logo">ANOTHER</h1>
+            <p class="subtitle">Pilih layanan yang ingin Anda gunakan</p>
+            
+            <div class="choice-buttons">
+                <div class="choice-btn" id="topupBtn">
+                    <i class="fas fa-coins"></i>
+                    <h3>TOPUP COIN</h3>
+                    <p>Isi coin untuk keperluan dalam aplikasi Another</p>
+                </div>
+                
+                <div class="choice-btn" id="vipBtn">
+                    <i class="fas fa-crown"></i>
+                    <h3>BELI AKSES VIP</h3>
+                    <p>Dapatkan akses eksklusif dan fitur premium</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 50px; color: #666; font-size: 0.9rem;">
+                <p>Website: Another | Developer: DrayXD | Since 2024 - 2026</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Konten Utama (Akan Ditampilkan Setelah Pilihan) -->
+    <div id="mainContent">
+        <!-- Topup Coin Section (Awalnya Tersembunyi) -->
+        <section id="topupSection" style="display: none;">
+            <div class="container">
+                <header>
+                    <div class="header-logo">TOPUP COIN</div>
+                    <button class="back-btn" id="backFromTopup">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Pilihan
+                    </button>
+                </header>
+                
+                <div class="coin-option">
+                    <div class="coin-select active" id="btcSelect">
+                        <div class="coin-icon btc-icon">
+                            <i class="fab fa-bitcoin"></i>
+                        </div>
+                        <h3 class="coin-name">Bitcoin (BTC)</h3>
+                        <p class="coin-price">Diterima dalam bentuk BTC</p>
+                    </div>
+                    
+                    <div class="coin-select" id="ltcSelect">
+                        <div class="coin-icon ltc-icon">
+                            <i class="fab fa-litecoin"></i>
+                        </div>
+                        <h3 class="coin-name">Litecoin (LTC)</h3>
+                        <p class="coin-price">Diterima dalam bentuk LTC</p>
+                    </div>
+                </div>
+                
+                <div class="coin-input-container">
+                    <div class="input-group">
+                        <label for="coinAmount">Jumlah Coin yang Ingin Dibeli</label>
+                        <input type="number" id="coinAmount" class="coin-input" min="50" step="50" value="50" placeholder="Minimal 50 coin">
+                        <div class="price-info">
+                            <span>Harga per 50 coin: Rp 5.000</span>
+                            <span>Minimal pembelian: 50 coin</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="receipt-preview">
+                    <h3 class="receipt-title"><i class="fas fa-receipt"></i> Rincian Pembelian</h3>
+                    <div class="receipt-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Metode Pembayaran</div>
+                            <div class="detail-value" id="receiptMethod">Bitcoin (BTC)</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Jumlah Coin</div>
+                            <div class="detail-value" id="receiptCoin">50 coin</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Harga Total</div>
+                            <div class="detail-value total-price" id="receiptPrice">Rp 5.000</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn whatsapp-btn" id="whatsappTopup">
+                        <i class="fab fa-whatsapp"></i> Lanjutkan via WhatsApp
+                    </button>
+                    <button class="action-btn telegram-btn" id="telegramTopup">
+                        <i class="fab fa-telegram"></i> Lanjutkan via Telegram
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- VIP Access Section (Awalnya Tersembunyi) -->
+        <section id="vipSection" style="display: none;">
+            <div class="container">
+                <header>
+                    <div class="header-logo">VIP ACCESS</div>
+                    <button class="back-btn" id="backFromVip">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Pilihan
+                    </button>
+                </header>
+                
+                <div class="vip-benefits">
+                    <h3 class="benefits-title">Manfaat VIP Membership</h3>
+                    <ul class="benefits-list">
+                        <li><i class="fas fa-bolt"></i> Efek bug lebih ganas</li>
+                        <li><i class="fas fa-coins"></i> Coin gratis bisa isi sendiri</li>
+                        <li><i class="fas fa-sync-alt"></i> Update lebih cepat</li>
+                        <li><i class="fas fa-crown"></i> Mendapat tittle VIP user</li>
+                        <li><i class="fas fa-user-plus"></i> Bebas create akun</li>
+                        <li><i class="fas fa-users"></i> Admin grup Another Public</li>
+                    </ul>
+                </div>
+                
+                <div class="vip-pricing">
+                    <h3 class="price-title">Harga Akses VIP</h3>
+                    <div class="original-price">Rp 70.000</div>
+                    <div class="discounted-price">Rp 50.000</div>
+                    <div class="discount-badge">DISKON 29%</div>
+                    <p style="color: #bbb; margin-bottom: 20px;">Harga promo berlaku terbatas</p>
+                    <button class="action-btn vip-btn" id="buyVipBtn">
+                        <i class="fas fa-crown"></i> BELI VIP AKSES
+                    </button>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn whatsapp-btn" id="whatsappVip">
+                        <i class="fab fa-whatsapp"></i> Lanjutkan via WhatsApp
+                    </button>
+                    <button class="action-btn telegram-btn" id="telegramVip">
+                        <i class="fab fa-telegram"></i> Lanjutkan via Telegram
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <div class="footer-info">Website: Another | Developer: DrayXD | Since 2024 - 2026</div>
+            <div>© 2024 - 2026 Another. All rights reserved.</div>
+        </footer>
+    </div>
+
+    <script>
+        // Variabel global
+        let selectedCoin = 'BTC';
+        let coinAmount = 50;
+        let pricePer50Coin = 5000;
+        
+        // Fungsi untuk menghitung harga total
+        function calculateTotalPrice() {
+            const totalPrice = (coinAmount / 50) * pricePer50Coin;
+            return totalPrice.toLocaleString('id-ID');
+        }
+        
+        // Fungsi untuk update struk
+        function updateReceipt() {
+            document.getElementById('receiptMethod').textContent = selectedCoin === 'BTC' ? 'Bitcoin (BTC)' : 'Litecoin (LTC)';
+            document.getElementById('receiptCoin').textContent = `${coinAmount} coin`;
+            document.getElementById('receiptPrice').textContent = `Rp ${calculateTotalPrice()}`;
+        }
+        
+        // Fungsi untuk generate pesan WhatsApp/Telegram
+        function generateMessage(type) {
+            if (type === 'topup') {
+                return `Halo, saya ingin topup coin Another%0A%0A` +
+                       `Metode Pembayaran: ${selectedCoin === 'BTC' ? 'Bitcoin (BTC)' : 'Litecoin (LTC)'}%0A` +
+                       `Jumlah Coin: ${coinAmount} coin%0A` +
+                       `Total Harga: Rp ${calculateTotalPrice()}%0A%0A` +
+                       `Saya ingin melanjutkan pembelian ini.`;
+            } else {
+                return `Halo, saya ingin membeli akses VIP Another%0A%0A` +
+                       `Saya tertarik dengan benefit VIP dan ingin membeli dengan harga promo Rp 50.000 (diskon 29% dari harga normal Rp 70.000).%0A%0A` +
+                       `Tolong bantu proses pembeliannya.`;
+            }
+        }
+        
+        // Event Listeners untuk overlay pilihan
+        document.getElementById('topupBtn').addEventListener('click', function() {
+            document.getElementById('choiceOverlay').style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('choiceOverlay').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('topupSection').style.display = 'block';
+                
+                setTimeout(() => {
+                    document.getElementById('mainContent').style.opacity = '1';
+                }, 50);
+                
+                // Update struk awal
+                updateReceipt();
+            }, 800);
+        });
+        
+        document.getElementById('vipBtn').addEventListener('click', function() {
+            document.getElementById('choiceOverlay').style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('choiceOverlay').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('vipSection').style.display = 'block';
+                
+                setTimeout(() => {
+                    document.getElementById('mainContent').style.opacity = '1';
+                }, 50);
+            }, 800);
+        });
+        
+        // Event Listeners untuk tombol kembali
+        document.getElementById('backFromTopup').addEventListener('click', function() {
+            document.getElementById('mainContent').style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('mainContent').style.display = 'none';
+                document.getElementById('topupSection').style.display = 'none';
+                document.getElementById('choiceOverlay').style.display = 'flex';
+                
+                setTimeout(() => {
+                    document.getElementById('choiceOverlay').style.opacity = '1';
+                }, 50);
+            }, 800);
+        });
+        
+        document.getElementById('backFromVip').addEventListener('click', function() {
+            document.getElementById('mainContent').style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('mainContent').style.display = 'none';
+                document.getElementById('vipSection').style.display = 'none';
+                document.getElementById('choiceOverlay').style.display = 'flex';
+                
+                setTimeout(() => {
+                    document.getElementById('choiceOverlay').style.opacity = '1';
+                }, 50);
+            }, 800);
+        });
+        
+        // Event Listeners untuk pilihan coin
+        document.getElementById('btcSelect').addEventListener('click', function() {
+            selectedCoin = 'BTC';
+            document.getElementById('btcSelect').classList.add('active');
+            document.getElementById('ltcSelect').classList.remove('active');
+            updateReceipt();
+        });
+        
+        document.getElementById('ltcSelect').addEventListener('click', function() {
+            selectedCoin = 'LTC';
+            document.getElementById('ltcSelect').classList.add('active');
+            document.getElementById('btcSelect').classList.remove('active');
+            updateReceipt();
+        });
+        
+        // Event Listener untuk input jumlah coin
+        document.getElementById('coinAmount').addEventListener('input', function() {
+            let value = parseInt(this.value);
+            
+            // Validasi minimal 50 coin
+            if (value < 50) {
+                this.value = 50;
+                value = 50;
+            }
+            
+            // Validasi kelipatan 50
+            if (value % 50 !== 0) {
+                value = Math.floor(value / 50) * 50;
+                this.value = value;
+            }
+            
+            coinAmount = value;
+            updateReceipt();
+        });
+        
+        // Event Listeners untuk tombol WhatsApp/Telegram (Topup)
+        document.getElementById('whatsappTopup').addEventListener('click', function() {
+            const message = generateMessage('topup');
+            window.open(`https://wa.me/6283151568511?text=${message}`, '_blank');
+        });
+        
+        document.getElementById('telegramTopup').addEventListener('click', function() {
+            const message = generateMessage('topup');
+            window.open(`https://t.me/Drayoffc?text=${message}`, '_blank');
+        });
+        
+        // Event Listeners untuk tombol WhatsApp/Telegram (VIP)
+        document.getElementById('whatsappVip').addEventListener('click', function() {
+            const message = generateMessage('vip');
+            window.open(`https://wa.me/6283151568511?text=${message}`, '_blank');
+        });
+        
+        document.getElementById('telegramVip').addEventListener('click', function() {
+            const message = generateMessage('vip');
+            window.open(`https://t.me/Drayoffc?text=${message}`, '_blank');
+        });
+        
+        // Event Listener untuk tombol beli VIP
+        document.getElementById('buyVipBtn').addEventListener('click', function() {
+            // Scroll ke tombol WhatsApp/Telegram
+            document.getElementById('whatsappVip').scrollIntoView({ behavior: 'smooth' });
+            
+            // Tambahkan efek visual
+            this.style.animation = 'glow 1s ease 2';
+            setTimeout(() => {
+                this.style.animation = '';
+            }, 2000);
+        });
+        
+        // Efek visual untuk input coin
+        document.getElementById('coinAmount').addEventListener('focus', function() {
+            this.style.boxShadow = '0 0 15px rgba(157, 0, 255, 0.7)';
+        });
+        
+        document.getElementById('coinAmount').addEventListener('blur', function() {
+            this.style.boxShadow = '';
+        });
+        
+        // Animasi elemen saat masuk viewport
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Terapkan animasi pada elemen yang ingin diamati
+        document.querySelectorAll('.coin-select, .coin-input-container, .receipt-preview, .action-btn, .vip-benefits, .vip-pricing').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
