@@ -198,6 +198,26 @@
             color: #4cc9f0;
             font-weight: bold;
         }
+        
+    #notPaidOverlay .modal-content {
+        background: rgba(26, 26, 46, 0.98);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        border-radius: 20px;
+        color: white;
+    }
+    
+    .manual-checking {
+        display: inline-block;
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+        
     </style>
 </head>
 <body>
@@ -378,7 +398,18 @@
                         <h4 id="paymentAmount">Rp 0</h4>
                         <p class="text-muted">Scan QRIS dengan aplikasi e-wallet Anda</p>
                     </div>
+<!-- QRIS Modal - TAMBAHKAN KODE INI DI DALAM modal-body SETELAH paymentStatus -->
+<div class="text-center mb-3" id="manualCheckSection">
+    <button class="btn btn-warning" onclick="manualCheckPayment()" id="manualCheckBtn">
+        <i class="fas fa-check-circle me-2"></i>Saya Sudah Membayar
+    </button>
+    <p class="small text-muted mt-2">Klik tombol ini jika sudah melakukan pembayaran</p>
+</div>
+
+
+<!-- Tambahkan style CSS di dalam tag style -->
                     
+                                                      
                     <div class="alert alert-warning">
                         <i class="fas fa-clock me-2"></i>
                         <strong>Pembayaran otomatis diverifikasi</strong>
@@ -445,109 +476,213 @@
         </div>
     </div>
 
+<!-- Tambahkan modal overlay di bagian akhir body -->
+<div class="modal fade" id="notPaidOverlay" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-5">
+                <div class="mb-4">
+                    <i class="fas fa-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="mb-3">Belum Terdeteksi Pembayaran</h4>
+                <p class="mb-4">Sistem belum mendeteksi pembayaran Anda. Pastikan:</p>
+                <ul class="text-start mb-4">
+                    <li>Anda sudah melakukan pembayaran</li>
+                    <li>Nominal pembayaran sesuai</li>
+                    <li>Pembayaran berhasil di aplikasi e-wallet</li>
+                </ul>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="retryManualCheck()">
+                        <i class="fas fa-redo me-2"></i>Cek Ulang Status
+                    </button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- Bootstrap & jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
-const apiAtlantic = "EkgNXh2PlJLn0ARMN5kZoM1mYZHm0ZzubUIDLblzNC3vVRMtfZMVoN8HjUSN1UF67XoxKsrEYTrhOM9N7rUrLJFJQ5yvtqh1QigU";
-const ATL_BASE = "https://atlantich2h.com";
-
-const toRupiah = (angka) => {
-  return Number(angka).toLocaleString("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0
-  }).replace("IDR", "Rp").trim();
-};
-
-function generateReffId() {
-  const rand = Math.random().toString(36).slice(2, 10).toUpperCase();
-  return `TRX-${Date.now()}-${rand}`;
-}
+    // === KONFIGURASI ATLANTIC ===
+    const ATLANTIC_API_KEY = "EkgNXh2PlJLn0ARMN5kZoM1mYZHm0ZzubUIDLblzNC3vVRMtfZMVoN8HjUSN1UF67XoxKsrEYTrhOM9N7rUrLJFJQ5yvtqh1QigU";
+    const ATLANTIC_BASE_URL = "https://atlantich2h.com";
     
-async function createQris(amount) {
-  const reffId = generateReffId();
-
-  const body = {
-    api_key: apiAtlantic,
-    reff_id: reffId,
-    nominal: amount,
-    type: "ewallet",
-    metode: "QRIS",
-  };
-
-  const res = await axios.post(
-    `${ATL_BASE}/deposit/create`,
-    new URLSearchParams(body).toString(),
-    {
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      timeout: 15000
-    }
-  );
-
-  if (!res.data || !res.data.data) return null;
-
-  const d = res.data.data;
-
-  return {
-    id: d.id,
-    reff_id: reffId,
-    amount: amount,
-    image: d.qr_image,
-    qr_string: d.qr_string,
-    status: d.status
-  };
-}
-
-async function checkQrisStatus(id) {
-  const res = await axios.post(
-    `${ATL_BASE}/deposit/status`,
-    new URLSearchParams({
-      api_key: apiAtlantic,
-      id: String(id),
-    }).toString(),
-    {
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      timeout: 10000
-    }
-  );
-
-  const status = res.data?.data?.status?.toLowerCase();
-  console.log("[QRIS STATUS]", id, status);
-
-  if (status === "success") return "success";
-
-  if (status === "processing") {
-    await instantCheck(id);
-    return "processing";
-  }
-
-  return status || "unknown";
-}
-
-
-async function instantCheck(id) {
-  try {
-    await axios.post(
-      `${ATL_BASE}/deposit/instant`,
-      new URLSearchParams({
-        api_key: apiAtlantic,
-        id: String(id),
-        action: "true"
-      }).toString(),
-      {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        timeout: 5000
-      }
-    );
-  } catch (e) {
-    console.log("Instant check skip (normal)");
-  }
-}
-
+    // === FUNGSI UTAMA ATLANTIC (SESUAI DOKUMENTASI) ===
     
+    // Format Rupiah
+    function toRupiah(angka) {
+        return 'Rp ' + Math.round(angka).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+    
+    // Generate Reff ID
+    function generateReffId() {
+        const timestamp = Date.now().toString(36);
+        const random = Math.random().toString(36).substring(2, 8);
+        return `BELIKOIN-${timestamp}-${random}`.toUpperCase();
+    }
+    
+    // 1. BUAT TRANSAKSI QRIS
+    async function createAtlanticTransaction(amount) {
+        try {
+            const reffId = generateReffId();
+            
+            // Format data sesuai dokumentasi
+            const formData = new URLSearchParams();
+            formData.append('api_key', ATLANTIC_API_KEY);
+            formData.append('reff_id', reffId);
+            formData.append('nominal', amount);
+            formData.append('type', 'ewallet');
+            formData.append('metode', 'qris'); // lowercase 'qris' sesuai contoh
+            
+            console.log('Membuat transaksi Atlantic:', {
+                amount: amount,
+                reff_id: reffId
+            });
+            
+            const response = await axios.post(
+                `${ATLANTIC_BASE_URL}/deposit/create`,
+                formData.toString(),
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json'
+                    },
+                    timeout: 15000
+                }
+            );
+            
+            console.log('Response Atlantic:', response.data);
+            
+            if (response.data.status === true && response.data.data) {
+                return {
+                    success: true,
+                    transactionId: response.data.data.id,
+                    reffId: response.data.data.reff_id,
+                    amount: response.data.data.nominal,
+                    qrString: response.data.data.qr_string,
+                    qrImageUrl: response.data.data.qr_image,
+                    status: response.data.data.status,
+                    createdAt: response.data.data.created_at,
+                    expiredAt: response.data.data.expired_at
+                };
+            } else {
+                throw new Error(response.data.message || 'Gagal membuat transaksi');
+            }
+            
+        } catch (error) {
+            console.error('Error create transaction:', error);
+            
+            // Debug info
+            if (error.response) {
+                console.error('Error response:', error.response.data);
+                console.error('Error status:', error.response.status);
+            }
+            
+            return {
+                success: false,
+                error: error.message || 'Gagal terhubung ke server pembayaran'
+            };
+        }
+    }
+    
+    // 2. CEK STATUS TRANSAKSI
+    async function checkAtlanticStatus(transactionId) {
+        try {
+            const formData = new URLSearchParams();
+            formData.append('api_key', ATLANTIC_API_KEY);
+            formData.append('id', transactionId);
+            
+            console.log('Checking status for:', transactionId);
+            
+            const response = await axios.post(
+                `${ATLANTIC_BASE_URL}/deposit/status`,
+                formData.toString(),
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json'
+                    },
+                    timeout: 10000
+                }
+            );
+            
+            console.log('Status response:', response.data);
+            
+            if (response.data.status === true && response.data.data) {
+                return {
+                    success: true,
+                    status: response.data.data.status.toLowerCase(),
+                    data: response.data.data
+                };
+            }
+            
+            return {
+                success: false,
+                status: 'unknown'
+            };
+            
+        } catch (error) {
+            console.error('Error check status:', error);
+            return {
+                success: false,
+                status: 'error',
+                error: error.message
+            };
+        }
+    }
+    
+    // 3. GENERATE QR CODE DARI STRING
+    function generateQRFromString(qrString) {
+        if (!qrString) return null;
+        
+        try {
+            // Encode untuk URL
+            const encodedString = encodeURIComponent(qrString);
+            
+            // Gunakan layanan QR code generator
+            return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&format=png&data=${encodedString}`;
+            
+        } catch (error) {
+            console.error('Error generate QR:', error);
+            return null;
+        }
+    }
+    
+    // 4. DOWNLOAD QR IMAGE JIKA URL TIDAK BISA DIAKSES
+    async function getQRImage(qrImageUrl, qrString) {
+        try {
+            // Coba akses langsung image URL dari Atlantic
+            if (qrImageUrl && qrImageUrl.startsWith('http')) {
+                // Coba HEAD request untuk cek apakah URL valid
+                try {
+                    await axios.head(qrImageUrl, { timeout: 5000 });
+                    return qrImageUrl; // URL valid
+                } catch (headError) {
+                    console.log('QR image URL tidak dapat diakses, menggunakan generator');
+                }
+            }
+            
+            // Fallback: generate dari qr_string
+            if (qrString) {
+                return generateQRFromString(qrString);
+            }
+            
+            // Fallback: generate dari info transaksi
+            return generateQRFromString(`Pembayaran QRIS: ${appState.totalAmount}`);
+            
+        } catch (error) {
+            console.error('Error get QR image:', error);
+            return generateQRFromString(qrString || 'QRIS Payment');
+        }
+    }
     
     // === LOGIC WEBSITE ===
     const SUGGESTED_AMOUNTS = [50, 100, 250, 500, 750, 1000];
@@ -636,7 +771,7 @@ async function instantCheck(id) {
         if (appState.selectedAmount) {
             $('#summaryAmount').text(appState.selectedAmount.toLocaleString('id-ID') + ' koin');
             const subtotal = appState.selectedAmount * PRICE_PER_COIN;
-            const fee = Math.floor(Math.random() * 100) + 1;
+            const fee = 500;
             const total = subtotal + fee;
             appState.totalAmount = total;
             $('#summaryFee').text(toRupiah(fee));
@@ -677,33 +812,61 @@ async function instantCheck(id) {
     // === FUNGSI PAYMENT UTAMA ===
     
 async function processPayment() {
-  const amount = appState.totalAmount;
-
-  const modal = new bootstrap.Modal(document.getElementById("qrisModal"));
-  modal.show();
-
-  const qris = await createQris(amount);
-  if (!qris) {
-    alert("Gagal membuat QRIS");
-    return;
-  }
-
-  document.getElementById("qrisImage").src = qris.image;
-  document.getElementById("qrisImage").classList.remove("d-none");
-  document.getElementById("paymentAmount").innerText = toRupiah(amount);
-
-  const interval = setInterval(async () => {
-    const status = await checkQrisStatus(qris.id);
-
-    if (status === "success") {
-      clearInterval(interval);
-      document.getElementById("paymentStatus").innerHTML =
-        `<span class="status-success">✅ Pembayaran Berhasil</span>`;
-      document.getElementById("closeModalBtn").disabled = false;
+    if (!appState.selectedAmount || !appState.selectedCoin) {
+        showAlert('error', 'Lengkapi pilihan koin & jumlah');
+        return;
     }
-  }, 5000);
-}
 
+    const modal = new bootstrap.Modal(document.getElementById('qrisModal'));
+    modal.show();
+// tampilkan harga asli ke modal
+$('#paymentAmount').text(toRupiah(appState.totalAmount));
+    // RESET UI
+    $('#qrisImage').addClass('d-none');
+    $('#loadingQris').removeClass('d-none');
+    $('#paymentStatus').html('<p class="status-pending">Membuat QRIS...</p>');
+    $('#redeemSection').addClass('d-none');
+
+    try {
+        const res = await axios.post(
+            "http://papaaa.queen-priv.my.id:2220/qris/create", // ganti domain backend
+            {
+                amount: appState.totalAmount,
+                coin: appState.selectedCoin,
+                coinAmount: appState.selectedAmount
+            }
+        );
+
+        if (!res.data.success) {
+            showAlert('error', 'Gagal membuat QRIS');
+            return;
+        }
+
+        // simpan tx
+        appState.transactionId = res.data.idtransaksi;
+
+        // tampilkan QR
+        $('#qrisImage')
+            .attr('src', res.data.imageqris)
+            .removeClass('d-none');
+
+        $('#loadingQris').addClass('d-none');
+
+        $('#paymentStatus').html(`
+            <p class="status-pending">
+                <i class="fas fa-spinner fa-spin me-2"></i>
+                Menunggu pembayaran...
+            </p>
+            <small>ID Transaksi: ${appState.transactionId}</small>
+        `);
+
+        startStatusChecking();
+
+    } catch (err) {
+        console.error(err);
+        showAlert('error', 'Server error');
+    }
+} 
     
     // Format waktu
     function formatTime(dateString) {
@@ -746,146 +909,77 @@ async function processPayment() {
     }
     
     // Mulai pengecekan status
-    function startStatusChecking() {
-        clearPaymentInterval(); // Clear previous interval
-        
-        let checkCount = 0;
-        const maxChecks = 72; // 6 menit (72 x 5 detik)
-        
-        appState.paymentInterval = setInterval(async () => {
-            checkCount++;
-            
-            if (!appState.transactionId) {
-                console.error('No transaction ID to check');
-                clearPaymentInterval();
-                return;
+
+function startStatusChecking() {
+    clearInterval(appState.paymentInterval);
+
+    appState.paymentInterval = setInterval(async () => {
+        try {
+            const res = await axios.post(
+                "http://papaaa.queen-priv.my.id:2220/qris/status",
+                {
+                    id: appState.transactionId,
+                    amount: appState.totalAmount
+                }
+            );
+
+            if (res.data.success) {
+                clearInterval(appState.paymentInterval);
+                handlePaymentSuccess();
             }
-            
-            try {
-                console.log(`Cek status ke-${checkCount} untuk ID: ${appState.transactionId}`);
-                
-                const statusResult = await checkAtlanticStatus(appState.transactionId);
-                
-                if (!statusResult.success) {
-                    // Error checking, continue
-                    console.warn('Status check failed, continuing...');
-                } else {
-                    // Update UI dengan status
-                    $('#paymentStatus').html(`
-                        <div class="status-pending">
-                            <i class="fas fa-spinner fa-spin me-2"></i>
-                            Status: ${statusResult.status.toUpperCase()} (${checkCount}/72)
-                        </div>
-                        <div class="mt-2 small">
-                            <div><strong>ID Transaksi:</strong> ${appState.transactionId}</div>
-                            <div><strong>Terakhir dicek:</strong> ${new Date().toLocaleTimeString('id-ID')}</div>
-                        </div>
-                    `);
-                    
-                    // Cek jika pembayaran berhasil
-                    if (statusResult.status === 'success' || statusResult.status === 'paid') {
-                        clearPaymentInterval();
-                        handlePaymentSuccess(statusResult.data);
-                        return;
-                    }
-                    
-                    // Cek jika expired atau failed
-                    if (statusResult.status === 'expired' || statusResult.status === 'failed') {
-                        clearPaymentInterval();
-                        handlePaymentFailed(statusResult.status);
-                        return;
-                    }
-                }
-                
-                // Timeout setelah max checks
-                if (checkCount >= maxChecks) {
-                    clearPaymentInterval();
-                    handlePaymentTimeout();
-                }
-                
-            } catch (error) {
-                console.error('Error in status check interval:', error);
-                
-                // Continue checking despite errors
-                if (checkCount >= maxChecks) {
-                    clearPaymentInterval();
-                    handlePaymentTimeout();
-                }
-            }
-        }, 5000); // Cek setiap 5 detik
-    }
+        } catch (e) {
+            console.error('Cek status gagal', e);
+        }
+    }, 5000);
+}
     
     // Handle pembayaran berhasil
-    async function handlePaymentSuccess(paymentData) {
-        console.log('Pembayaran berhasil!', paymentData);
-        
-        // Update UI
-        $('#paymentStatus').html(`
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle me-2"></i>
-                <strong>Pembayaran Berhasil!</strong>
-                <p class="mb-0 mt-2">Verifikasi transaksi...</p>
-            </div>
-        `);
-        
-        // Generate redeem code
-        try {
-            // Simulasi pembuatan kode redeem
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            const redeemCode = generateRedeemCode();
-            appState.redeemCode = redeemCode;
-            
-            // Tampilkan kode redeem
-            $('#redeemCodeDisplay').text(redeemCode);
-            $('#redeemSection').removeClass('d-none');
-            
-            $('#paymentStatus').html(`
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle me-2"></i>
-                    <strong>Pembayaran Berhasil!</strong>
-                    <p class="mb-0 mt-2">Transaksi selesai.</p>
-                </div>
-                <div class="mt-3 small">
-                    <div><strong>Metode:</strong> ${paymentData.metode || 'QRIS'}</div>
-                    <div><strong>Waktu:</strong> ${paymentData.created_at || new Date().toLocaleString('id-ID')}</div>
-                </div>
-            `);
-            
-            // Enable close button
-            $('#closeModalBtn').prop('disabled', false);
-            
-            // Tampilkan notifikasi
-            showAlert('success', 'Pembayaran berhasil! Kode redeem telah dibuat.');
-            
-            // Reset state
-            appState.isProcessing = false;
-            appState.paymentAttempts = 0;
-            
-        } catch (error) {
-            console.error('Error generating redeem code:', error);
-            
-            // Fallback
-            const fallbackCode = generateRedeemCode();
-            appState.redeemCode = fallbackCode;
-            
-            $('#redeemCodeDisplay').text(fallbackCode);
-            $('#redeemSection').removeClass('d-none');
-            
-            $('#paymentStatus').html(`
-                <div class="alert alert-warning">
-                    <i class="fas fa-check-circle me-2"></i>
-                    <strong>Pembayaran Berhasil!</strong>
-                    <p class="mb-0 mt-2">Kode redeem dibuat secara lokal.</p>
-                </div>
-            `);
-            
-            $('#closeModalBtn').prop('disabled', false);
-            showAlert('success', 'Pembayaran berhasil!');
-            appState.isProcessing = false;
-            appState.paymentAttempts = 0;
+
+
+async function createRedeemCode() {
+  try {
+    const res = await axios.get(
+      "http://papaaa.queen-priv.my.id:3000/createcode",
+      {
+        params: {
+          coin: appState.selectedCoin,
+          amount: appState.selectedAmount,
+          creator: "web"
         }
+      }
+    );
+
+    if (!res.data.success) {
+      showAlert("error", res.data.msg || "Gagal membuat kode");
+      return;
     }
+
+    // tampilkan ke UI (PAKAI DIV LAMA)
+    $('#redeemCodeDisplay').text(res.data.code);
+    $('#redeemSection').removeClass('d-none');
+
+    showAlert(
+      "success",
+      `Kode berhasil dibuat: ${res.data.code}`
+    );
+
+  } catch (err) {
+    console.error(err);
+    showAlert("error", "Gagal terhubung ke server");
+  }
+}
+
+function handlePaymentSuccess() {
+  $('#paymentStatus').html(`
+    <div class="alert alert-success">
+      <i class="fas fa-check-circle me-2"></i>
+      Pembayaran Berhasil
+    </div>
+  `);
+
+  createRedeemCode(); // 🔥 sekarang lewat API
+}
+
     
     // Generate redeem code
     function generateRedeemCode() {
@@ -983,6 +1077,133 @@ Sertakan informasi:
     window.addEventListener('beforeunload', function(e) {
         clearPaymentInterval();
     });
+    // ===== FUNGSI BARU UNTUK MANUAL CHECK =====
+    // TAMBAHKAN SETELAH SEMUA FUNGSI YANG SUDAH ADA
+    
+    // Fungsi untuk cek pembayaran manual
+    async function manualCheckPayment() {
+        if (!appState.transactionId) {
+            showAlert('error', 'Tidak ada transaksi aktif');
+            return;
+        }
+        
+        // Disable tombol dan tampilkan loading
+        const btn = document.getElementById('manualCheckBtn');
+        const originalHTML = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `
+            <span class="manual-checking">
+                <i class="fas fa-spinner fa-spin me-2"></i>Mengecek...
+            </span>
+        `;
+        
+        try {
+            // Cek status pembayaran menggunakan fungsi yang sudah ada
+            const res = await axios.post(
+                "http://papaaa.queen-priv.my.id:2220/qris/status",
+                {
+                    id: appState.transactionId,
+                    amount: appState.totalAmount
+                }
+            );
+            
+            if (res.data.success) {
+                // Jika berhasil, lanjutkan ke pembuatan kode redeem
+                handlePaymentSuccess();
+            } else {
+                // Jika belum bayar, tampilkan overlay
+                showNotPaidOverlay();
+            }
+        } catch (error) {
+            console.error('Error manual check:', error);
+            showNotPaidOverlay();
+        } finally {
+            // Kembalikan tombol ke kondisi normal
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+        }
+    }
+    
+    // Tampilkan overlay belum bayar
+    function showNotPaidOverlay() {
+        const overlayModal = new bootstrap.Modal(document.getElementById('notPaidOverlay'));
+        overlayModal.show();
+    }
+    
+    // Coba ulang pengecekan manual
+    async function retryManualCheck() {
+        const overlayModal = bootstrap.Modal.getInstance(document.getElementById('notPaidOverlay'));
+        if (overlayModal) overlayModal.hide();
+        
+        await manualCheckPayment();
+    }
+    
+    // Fungsi untuk handle ketika modal QRIS ditutup
+    function onQRISModalHidden() {
+        // Sembunyikan section manual check
+        document.getElementById('manualCheckSection').classList.add('d-none');
+    }
+    
+    // Fungsi untuk handle ketika modal QRIS dibuka
+    function onQRISModalShown() {
+        // Tampilkan section manual check setelah 3 detik (setelah QRIS muncul)
+        setTimeout(() => {
+            document.getElementById('manualCheckSection').classList.remove('d-none');
+        }, 3000);
+    }
+    
+    // Event listener untuk modal QRIS
+    document.addEventListener('DOMContentLoaded', function() {
+        const qrisModal = document.getElementById('qrisModal');
+        
+        qrisModal.addEventListener('show.bs.modal', function() {
+            // Sembunyikan tombol manual check saat modal pertama dibuka
+            document.getElementById('manualCheckSection').classList.add('d-none');
+        });
+        
+        qrisModal.addEventListener('shown.bs.modal', function() {
+            // Set timeout untuk menampilkan tombol manual check
+            setTimeout(() => {
+                document.getElementById('manualCheckSection').classList.remove('d-none');
+            }, 3000);
+        });
+        
+        qrisModal.addEventListener('hidden.bs.modal', function() {
+            // Sembunyikan tombol manual check saat modal ditutup
+            document.getElementById('manualCheckSection').classList.add('d-none');
+        });
+    });
+    
+    // Modifikasi kecil pada fungsi processPayment untuk menyembunyikan tombol manual saat awal
+    const originalProcessPayment = processPayment;
+    processPayment = async function() {
+        // Sembunyikan tombol manual check
+        document.getElementById('manualCheckSection').classList.add('d-none');
+        
+        // Jalankan fungsi asli
+        await originalProcessPayment.apply(this, arguments);
+    };
+    
+    // Modifikasi kecil pada fungsi handlePaymentSuccess untuk menyembunyikan tombol manual
+    const originalHandlePaymentSuccess = handlePaymentSuccess;
+    handlePaymentSuccess = async function() {
+        // Sembunyikan tombol manual check
+        document.getElementById('manualCheckSection').classList.add('d-none');
+        
+        // Jalankan fungsi asli
+        await originalHandlePaymentSuccess.apply(this, arguments);
+    };
+    
+    // Modifikasi kecil pada fungsi resetPaymentModal untuk menyembunyikan tombol manual
+    const originalResetPaymentModal = resetPaymentModal;
+    resetPaymentModal = function() {
+        // Jalankan fungsi asli
+        originalResetPaymentModal.apply(this, arguments);
+        
+        // Sembunyikan tombol manual check
+        document.getElementById('manualCheckSection').classList.add('d-none');
+    };
 </script>
+
 </body>
 </html>
