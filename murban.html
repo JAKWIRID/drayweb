@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dray Ban Season 2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --neon-purple: #b026ff;
+            --neon-pink: #ff2a9c;
+            --dark-bg: #0a0a0f;
+            --darker-bg: #050508;
+            --card-bg: rgba(20, 15, 30, 0.95);
+            --text-light: #f0f0ff;
+            --text-glow: rgba(176, 38, 255, 0.7);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+            font-size: 14px;
+            touch-action: manipulation;
+        }
+
+        /* Background dengan efek sederhana */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(176, 38, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 42, 156, 0.1) 0%, transparent 50%);
+        }
+
+        /* Overlay awal - lebih sederhana */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--darker-bg);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .overlay-content {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.85rem;
+            color: #aaa;
+            font-weight: 300;
+        }
+
+        .selection-title {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #ccc;
+            font-weight: 400;
+        }
+
+        .package-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .package-option {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            text-align: left;
+            position: relative;
+        }
+
+        .package-option:active {
+            transform: scale(0.98);
+        }
+
+        .package-option:hover, .package-option:focus {
+            border-color: var(--neon-purple);
+            box-shadow: 0 5px 15px rgba(176, 38, 255, 0.2);
+        }
+
+        .package-option.recommended {
+            border: 1px solid var(--neon-pink);
+        }
+
+        .recommended-badge {
+            position: absolute;
+            top: -8px;
+            right: 15px;
+            background: var(--neon-pink);
+            color: white;
+            padding: 3px 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .package-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .package-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .package-icon {
+            color: var(--neon-purple);
+            font-size: 1.2rem;
+        }
+
+        .package-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--neon-pink);
+            margin-bottom: 5px;
+        }
+
+        .package-desc {
+            font-size: 0.85rem;
+            color: #bbb;
+            line-height: 1.4;
+        }
+
+        .promo-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #ff2a9c, #ff9900);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .developer-info {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.75rem;
+            color: #777;
+            line-height: 1.4;
+        }
+
+        /* Konten utama */
+        #main-content {
+            display: none;
+            max-width: 100%;
+            padding: 15px;
+        }
+
+        .main-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 10px;
+        }
+
+        .main-logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(176, 38, 255, 0.2);
+            border: none;
+            color: var(--neon-purple);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .package-details-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .benefits-card, .receipt-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(176, 38, 255, 0.2);
+        }
+
+        .card-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: white;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--neon-purple);
+        }
+
+        .price-large {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--neon-pink);
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .benefit-list {
+            list-style-type: none;
+            margin-top: 15px;
+        }
+
+        .benefit-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            font-size: 0.9rem;
+        }
+
+        .benefit-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--neon-purple);
+            font-weight: bold;
+        }
+
+        .receipt-details {
+            margin-top: 15px;
+        }
+
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+        }
+
+        .receipt-item.total {
+            border-top: 2px solid var(--neon-purple);
+            border-bottom: none;
+            margin-top: 10px;
+            padding-top: 15px;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .join-button {
+            display: block;
+            width: 100%;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 25px;
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.5px;
+            transition: transform 0.2s;
+        }
+
+        .join-button:active {
+            transform: scale(0.98);
+        }
+
+        .info-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(176, 38, 255, 0.1);
+            border-radius: 10px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .info-box i {
+            color: var(--neon-purple);
+            margin-right: 8px;
+        }
+
+        /* Modal kontak */
+        #contact-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--darker-bg);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .contact-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .contact-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .contact-subtitle {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .contact-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .contact-option {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .contact-option:active {
+            transform: scale(0.98);
+        }
+
+        .contact-option:hover, .contact-option:focus {
+            border-color: var(--neon-purple);
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--neon-purple);
+        }
+
+        .contact-option-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .contact-detail {
+            font-size: 0.9rem;
+            color: #bbb;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .back-to-packages {
+            margin-top: 20px;
+            background: none;
+            border: none;
+            color: var(--neon-purple);
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-out {
+            animation: fadeOut 0.3s ease forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            body {
+                font-size: 16px;
+            }
+            
+            .logo {
+                font-size: 2.2rem;
+            }
+            
+            .main-logo {
+                font-size: 1.8rem;
+            }
+            
+            .package-option {
+                padding: 20px;
+            }
+            
+            .contact-options {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .contact-option {
+                flex: 1;
+                min-width: 180px;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay awal -->
+    <div id="overlay">
+        <div class="overlay-content">
+            <div class="logo-container">
+                <div class="logo">DRAY BAN S2</div>
+                <div class="logo-subtitle">Konsultan Ban Profesional</div>
+            </div>
+            
+            <p class="selection-title">Pilih paket yang ingin Anda beli:</p>
+            
+            <div class="package-selection">
+                <!-- Paket 1 -->
+                <div class="package-option" data-package="whatsapp">
+                    <div class="package-header">
+                        <div class="package-title">MURID BAN WHATSAPP</div>
+                        <div class="package-icon"><i class="fab fa-whatsapp"></i></div>
+                    </div>
+                    <div class="package-price">Rp. 10.000</div>
+                    <div class="package-desc">Paket lengkap untuk belajar trik ban WhatsApp dengan bahan lengkap.</div>
+                </div>
+                
+                <!-- Paket 2 -->
+                <div class="package-option recommended" data-package="private">
+                    <div class="recommended-badge">REKOMENDASI</div>
+                    <div class="package-header">
+                        <div class="package-title">MURID BAN PRIVATE</div>
+                        <div class="package-icon"><i class="fas fa-crown"></i></div>
+                    </div>
+                    <div class="package-price">Rp. 25.000</div>
+                    <div class="package-desc">Paket premium dengan akses ke semua trik ban di berbagai platform.</div>
+                </div>
+                
+                <!-- Paket 3 -->
+                <div class="package-option" data-package="s2">
+                    <div class="package-header">
+                        <div class="package-title">PT BAN S2</div>
+                        <div class="package-icon"><i class="fas fa-user-tie"></i></div>
+                    </div>
+                    <div class="package-price">Rp. 50.000 <span class="promo-badge">PROMO</span></div>
+                    <div class="package-desc">Menjadi partner ban Dray S2 dan dapatkan keuntungan lebih.</div>
+                </div>
+            </div>
+            
+            <div class="developer-info">
+                <p>Website: Dray Ban Season 2 | Developer: DrayXD</p>
+                <p>Since 2024 - 2026</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Konten utama -->
+    <div id="main-content">
+        <button class="back-button" id="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        
+        <header class="main-header">
+            <div class="main-logo">DRAY BAN S2</div>
+            <div class="logo-subtitle">Konsultan Ban Profesional</div>
+        </header>
+        
+        <div class="package-details-container">
+            <div class="benefits-card">
+                <h2 class="card-title" id="package-selected-title">MURID BAN WHATSAPP</h2>
+                <div class="price-large" id="package-price">Rp. 10.000</div>
+                
+                <h3 style="color: var(--neon-purple); font-size: 1rem; margin-top: 15px;">Benefit:</h3>
+                <ul class="benefit-list" id="benefit-list">
+                    <!-- Benefit akan diisi oleh JavaScript -->
+                </ul>
+                
+                <button class="join-button" id="join-button">
+                    <i class="fas fa-rocket"></i> JOIN SEKARANG
+                </button>
+            </div>
+            
+            <div class="receipt-card">
+                <h2 class="card-title">STRUK PEMBELIAN</h2>
+                
+                <div class="receipt-details">
+                    <div class="receipt-item">
+                        <span>Paket:</span>
+                        <span id="receipt-package">MURID BAN WHATSAPP</span>
+                    </div>
+                    
+                    <div class="receipt-item">
+                        <span>Harga:</span>
+                        <span id="receipt-price">Rp. 10.000</span>
+                    </div>
+                    
+                    <div class="receipt-item total">
+                        <span>TOTAL:</span>
+                        <span id="receipt-total">Rp. 10.000</span>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <p><i class="fas fa-info-circle"></i> <strong>Informasi Penting:</strong> Setelah klik "Join Sekarang", pilih metode kontak untuk melanjutkan pembelian. Data struk ini akan dikirimkan secara otomatis.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="developer-info">
+            <p>Website: Dray Ban Season 2 | Developer: DrayXD</p>
+            <p>Since 2024 - 2026</p>
+        </div>
+    </div>
+    
+    <!-- Modal kontak -->
+    <div id="contact-modal">
+        <div class="close-modal" id="close-modal">&times;</div>
+        
+        <div class="contact-header">
+            <div class="contact-title">PILIH KONTAK</div>
+            <div class="contact-subtitle">Pilih metode untuk melanjutkan pembelian</div>
+        </div>
+        
+        <div class="contact-options">
+            <!-- WhatsApp -->
+            <div class="contact-option" data-contact="whatsapp">
+                <div class="contact-icon">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <h3 class="contact-option-title">WhatsApp</h3>
+                <p class="contact-detail">6283151568511</p>
+            </div>
+            
+            <!-- Telegram -->
+            <div class="contact-option" data-contact="telegram">
+                <div class="contact-icon">
+                    <i class="fab fa-telegram"></i>
+                </div>
+                <h3 class="contact-option-title">Telegram</h3>
+                <p class="contact-detail">@Drayoffc</p>
+            </div>
+            
+            <!-- Bot Auto Order -->
+            <div class="contact-option" data-contact="bot">
+                <div class="contact-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="contact-option-title">Bot Auto Order</h3>
+                <p class="contact-detail">@draystorebot</p>
+            </div>
+        </div>
+        
+        <button class="back-to-packages" id="back-to-packages">
+            <i class="fas fa-arrow-left"></i> Kembali ke pilihan paket
+        </button>
+    </div>
+    
+    <!-- Background animasi sederhana -->
+    <div class="bg-animation"></div>
+
+    <script>
+        // Data paket
+        const packages = {
+            whatsapp: {
+                title: "MURID BAN WHATSAPP",
+                price: "Rp. 10.000",
+                benefits: [
+                    "Get trik ban whatsapp",
+                    "Get trik invisible ban",
+                    "Get trik 2 nomor (tanpa nomor old)",
+                    "Get trik FakeChat New",
+                    "Free update MT ban",
+                    "Dapat bahan lengkap",
+                    "DII"
+                ]
+            },
+            private: {
+                title: "MURID BAN PRIVATE",
+                price: "Rp. 25.000",
+                benefits: [
+                    "Get trik ban whatsapp",
+                    "Get trik ban Telegram",
+                    "Get trik ban Instagram",
+                    "Get trik ban 2 nomor new",
+                    "Get trik invisible ban",
+                    "Get trik FakeChat New",
+                    "Free update MT ban",
+                    "Dapat bahan lengkap",
+                    "DII"
+                ]
+            },
+            s2: {
+                title: "PT BAN S2",
+                price: "Rp. 50.000",
+                benefits: [
+                    "Menjadi partner ban Dray S2",
+                    "Bisa menjual murid ban",
+                    "Bisa menjual murid ban private",
+                    "Dijamin balik modal (balmod)"
+                ]
+            }
+        };
+
+        // Data kontak
+        const contacts = {
+            whatsapp: {
+                platform: "WhatsApp",
+                target: "6283151568511",
+                url: "https://wa.me/6283151568511",
+                messageParam: "text"
+            },
+            telegram: {
+                platform: "Telegram",
+                target: "@Drayoffc",
+                url: "https://t.me/Drayoffc",
+                messageParam: "text"
+            },
+            bot: {
+                platform: "Telegram Bot",
+                target: "@draystorebot",
+                url: "https://t.me/draystorebot",
+                messageParam: "start"
+            }
+        };
+
+        // Variabel global
+        let selectedPackage = null;
+
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup event listener untuk pilihan paket
+            document.querySelectorAll('.package-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const packageType = this.getAttribute('data-package');
+                    selectPackage(packageType);
+                });
+                
+                // Tambahkan event untuk touch
+                option.addEventListener('touchstart', function() {
+                    this.style.opacity = '0.8';
+                });
+                
+                option.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                });
+            });
+            
+            // Setup tombol join
+            document.getElementById('join-button').addEventListener('click', showContactModal);
+            
+            // Setup pilihan kontak
+            document.querySelectorAll('.contact-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const contactType = this.getAttribute('data-contact');
+                    redirectToContact(contactType);
+                });
+                
+                // Tambahkan event untuk touch
+                option.addEventListener('touchstart', function() {
+                    this.style.opacity = '0.8';
+                });
+                
+                option.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                });
+            });
+            
+            // Setup tombol close modal
+            document.getElementById('close-modal').addEventListener('click', function() {
+                document.getElementById('contact-modal').style.display = 'none';
+            });
+            
+            // Setup tombol back
+            document.getElementById('back-button').addEventListener('click', function() {
+                showOverlay();
+            });
+            
+            // Setup tombol back to packages
+            document.getElementById('back-to-packages').addEventListener('click', function() {
+                document.getElementById('contact-modal').style.display = 'none';
+            });
+            
+            // Optimasi untuk touch devices
+            document.addEventListener('touchmove', function(e) {
+                // Mencegah scroll default saat tidak diperlukan
+                if (e.target.classList.contains('package-option') || 
+                    e.target.classList.contains('contact-option') ||
+                    e.target.closest('.package-option') || 
+                    e.target.closest('.contact-option')) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        });
+
+        // Fungsi untuk memilih paket
+        function selectPackage(packageType) {
+            selectedPackage = packageType;
+            const packageData = packages[packageType];
+            
+            // Update tampilan
+            document.getElementById('package-selected-title').textContent = packageData.title;
+            document.getElementById('package-price').textContent = packageData.price;
+            document.getElementById('receipt-package').textContent = packageData.title;
+            document.getElementById('receipt-price').textContent = packageData.price;
+            document.getElementById('receipt-total').textContent = packageData.price;
+            
+            // Update benefit list
+            const benefitList = document.getElementById('benefit-list');
+            benefitList.innerHTML = '';
+            
+            packageData.benefits.forEach(benefit => {
+                const li = document.createElement('li');
+                li.textContent = benefit;
+                benefitList.appendChild(li);
+            });
+            
+            // Sembunyikan overlay dan tampilkan konten utama
+            hideOverlay();
+        }
+
+        // Fungsi untuk menyembunyikan overlay
+        function hideOverlay() {
+            const overlay = document.getElementById('overlay');
+            const mainContent = document.getElementById('main-content');
+            
+            overlay.classList.add('fade-out');
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                mainContent.style.display = 'block';
+                overlay.classList.remove('fade-out');
+            }, 300);
+        }
+
+        // Fungsi untuk menampilkan overlay
+        function showOverlay() {
+            const overlay = document.getElementById('overlay');
+            const mainContent = document.getElementById('main-content');
+            
+            mainContent.style.display = 'none';
+            overlay.style.display = 'flex';
+        }
+
+        // Fungsi untuk menampilkan modal kontak
+        function showContactModal() {
+            document.getElementById('contact-modal').style.display = 'flex';
+        }
+
+        // Fungsi untuk redirect ke kontak
+        function redirectToContact(contactType) {
+            const contactData = contacts[contactType];
+            const packageData = packages[selectedPackage];
+            
+            // Buat pesan
+            const message = `Halo, saya ingin membeli paket:\n\n` +
+                          `*${packageData.title}*\n` +
+                          `Harga: ${packageData.price}\n\n` +
+                          `Saya memilih paket ini melalui website Dray Ban Season 2.`;
+            
+            const encodedMessage = encodeURIComponent(message);
+            let url = contactData.url;
+            
+            if (contactType === 'whatsapp' || contactType === 'telegram') {
+                url += `?${contactData.messageParam}=${encodedMessage}`;
+            }
+            
+            // Buka link
+            window.open(url, '_blank');
+            
+            // Tutup modal setelah delay
+            setTimeout(() => {
+                document.getElementById('contact-modal').style.display = 'none';
+            }, 500);
+        }
+
+        // Optimasi untuk perangkat rendah
+        window.addEventListener('load', function() {
+            // Tambahkan class loaded untuk transisi halus
+            document.body.classList.add('loaded');
+            
+            // Cegah zoom double tap di mobile
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        });
+    </script>
+</body>
+</html>
