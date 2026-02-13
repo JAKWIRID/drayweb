@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>MT BAN FAKECHAT • DrayXD</title>
+    <!-- Font modern (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0b0b;
+            color: #f0f0f0;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background motion dengan efek gradien merah-hitam bergerak */
+        .moving-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: #0a0000;
+            overflow: hidden;
+        }
+
+        .moving-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(255, 20, 20, 0.25) 0%, transparent 25%),
+                        radial-gradient(circle at 70% 60%, rgba(200, 0, 0, 0.35) 0%, transparent 35%),
+                        repeating-linear-gradient(45deg, #1a0000 0px, #1a0000 2px, #2a0000 2px, #2a0000 8px);
+            animation: bgGlide 22s infinite alternate ease-in-out;
+            filter: blur(8px);
+            opacity: 0.7;
+        }
+
+        .moving-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 80% 20%, #ff3a3a20, transparent 50%),
+                        radial-gradient(ellipse at 20% 80%, #ff000020, transparent 50%);
+            animation: bgPulse 8s infinite alternate;
+        }
+
+        @keyframes bgGlide {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(5%, 5%) rotate(2deg); }
+        }
+        @keyframes bgPulse {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        /* overlay popup */
+        .popup-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s;
+        }
+        .popup-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-card {
+            background: linear-gradient(145deg, #1f0c0c, #130505);
+            max-width: 340px;
+            width: 90%;
+            border: 2px solid #c00000;
+            box-shadow: 0 0 30px #ff4040, 0 0 60px #a00;
+            border-radius: 32px;
+            padding: 24px 20px 20px;
+            position: relative;
+            text-align: center;
+            color: #fff;
+            animation: popupRise 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+        }
+
+        @keyframes popupRise {
+            0% { transform: scale(0.8) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 26px;
+            color: #aaa;
+            cursor: pointer;
+            transition: 0.2s;
+            line-height: 1;
+        }
+        .popup-close:hover { color: #ff5555; transform: scale(1.1); }
+
+        .popup-card h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff8888, #ff2222);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+        .popup-card p {
+            background: #2c1414;
+            padding: 14px 10px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            border: 1px solid #a33;
+            margin: 15px 0 10px;
+            box-shadow: inset 0 2px 5px #00000055;
+        }
+        .popup-btn {
+            background: linear-gradient(45deg, #b60000, #ea0f0f);
+            border: none;
+            color: white;
+            font-weight: 800;
+            font-size: 1.4rem;
+            padding: 16px 10px;
+            border-radius: 60px;
+            width: 100%;
+            cursor: pointer;
+            margin: 10px 0 5px;
+            box-shadow: 0 5px 0 #5a0000, 0 8px 20px red;
+            transition: 0.07s linear;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        .popup-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 2px 0 #5a0000, 0 8px 20px red;
+        }
+        .popup-footer {
+            font-size: 0.8rem;
+            color: #a88;
+            margin-top: 12px;
+        }
+
+        /* container utama */
+        .main-container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(10, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid #b30000;
+            border-radius: 48px 48px 36px 36px;
+            padding: 24px 18px 28px;
+            box-shadow: 0 20px 40px rgba(255, 0, 0, 0.3), 0 0 0 2px #330000 inset;
+            transition: all 0.2s;
+        }
+
+        /* NOTE dengan lengkungan sedikit (border-radius 12px) dan lonceng kuning */
+        .note-section {
+            background: rgba(40, 8, 8, 0.8);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid #b33;
+            border-radius: 12px;  /* Tidak terlalu bulat, hanya sedikit lengkung */
+            padding: 12px 18px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        }
+        .note-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #ffdddd;
+        }
+        .note-content i {
+            font-size: 1.5rem;
+            color: #FFD700; /* Warna kuning */
+            filter: drop-shadow(0 0 5px #ffaa00);
+        }
+        .note-join-btn {
+            background: linear-gradient(145deg, #c20000, #8b0000);
+            border: 1px solid #ff8a8a;
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 8px 22px;
+            border-radius: 30px;  /* Sedikit bulat tapi tidak terlalu */
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 0 #4a0000, 0 4px 12px #f33;
+            transition: 0.1s;
+            white-space: nowrap;
+        }
+        .note-join-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #4a0000, 0 4px 12px #f33;
+        }
+
+        /* Judul di atas kolom copy */
+        .fakechat-title {
+            display: inline-block;
+            background: #2f0c0c;
+            padding: 6px 24px 6px 20px;
+            border-radius: 30px 30px 30px 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ff6666;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px #ff2a2a;
+        }
+        .fakechat-title i {
+            color: #ff7b7b;
+            margin-right: 8px;
+        }
+
+        /* kotak teks utama + copy */
+        .copy-section {
+            background: #1e0808e0;
+            border-radius: 24px;  /* konsisten sedikit lengkung */
+            padding: 18px 18px 12px 18px;
+            border: 1px solid #b33;
+            box-shadow: 0 0 20px #ff000050, inset 0 0 10px #2f0000;
+            margin-bottom: 20px;
+        }
+        .copy-textbox {
+            background: #0c0101f2;
+            border-radius: 20px;
+            padding: 20px 18px;
+            border: 1px solid #a22;
+            color: #fdd;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            font-weight: 400;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 360px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #b22 #2b0a0a;
+            box-shadow: inset 0 0 15px #1a0000;
+        }
+        .copy-textbox::-webkit-scrollbar { width: 6px; }
+        .copy-textbox::-webkit-scrollbar-track { background: #2b0a0a; border-radius: 10px; }
+        .copy-textbox::-webkit-scrollbar-thumb { background: #b22; border-radius: 10px; }
+
+        .btn-copy-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 12px;
+        }
+        .btn-copy {
+            background: linear-gradient(145deg, #b40202, #6b0000);
+            border: 0;
+            padding: 12px 34px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid #ff5a5a;
+            box-shadow: 0 5px 0 #3d0000, 0 6px 16px #f30;
+        }
+        .btn-copy:active { transform: translateY(4px); box-shadow: 0 1px 0 #3d0000, 0 6px 16px #f30; }
+        .btn-copy i { font-size: 1.3rem; }
+
+        /* laporan (report) 2 fungsi */
+        .report-duo {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0 25px;
+            background: #1f0606b0;
+            border-radius: 40px;
+            padding: 12px 16px;
+            border: 1px solid #c44;
+            font-weight: 600;
+        }
+        .report-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #2f0d0d;
+            padding: 8px 24px;
+            border-radius: 40px;
+            border: 1px solid #b22;
+            box-shadow: 0 0 12px red;
+        }
+        .report-item i { color: #ff6666; font-size: 1.3rem; }
+        .report-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #ffa0a0;
+        }
+        .report-label { font-size: 0.8rem; color: #ccc; }
+
+        /* tiga tombol action + tambahan BELI NOKOS (di bawah JOIN MURID BAN) */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 10px 0 20px;
+        }
+        .action-btn {
+            background: linear-gradient(145deg, #a80000, #4f0000);
+            border: 1px solid #ff6767;
+            color: white;
+            font-weight: 700;
+            padding: 16px 20px;
+            border-radius: 40px;
+            font-size: 1rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1 1 160px;
+            justify-content: center;
+            transition: 0.15s;
+            box-shadow: 0 4px 0 #2f0000, 0 6px 18px #ff0000;
+            letter-spacing: 0.5px;
+        }
+        .action-btn i { font-size: 1.3rem; }
+        .action-btn:hover { filter: brightness(1.2); transform: translateY(-2px); box-shadow: 0 6px 0 #2f0000, 0 10px 25px red; }
+        .action-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #2f0000, 0 8px 20px red; }
+
+        /* footer developer */
+        .footer-dev {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.8rem;
+            color: #b77;
+            border-top: 1px dashed #a33;
+            padding-top: 16px;
+            letter-spacing: 1px;
+        }
+        .footer-dev strong {
+            color: #ff7b7b;
+            font-weight: 800;
+        }
+
+        a, button { text-decoration: none; outline: none; user-select: none; }
+    </style>
+</head>
+<body>
+    <div class="moving-bg"></div>
+
+    <!-- POPUP / OVERLAY iklan -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-card">
+            <span class="popup-close" id="closePopupBtn"><i class="fas fa-times-circle"></i></span>
+            <h2><i class="fas fa-skull"></i> JOIN MURID BAN</h2>
+            <p>🚫 WHATSAPP WORK 100%<br> ⚡ MURBAN DRAY TERBATAS!</p>
+            <button class="popup-btn" id="beliPopupBtn">BELI <i class="fas fa-bolt"></i></button>
+            <div class="popup-footer">*klik BELI langsung diarahkan</div>
+        </div>
+    </div>
+
+    <!-- konten utama -->
+    <div class="main-container">
+        <!-- NOTE dengan border-radius 12px (sedikit melengkung) dan lonceng kuning -->
+        <div class="note-section">
+            <div class="note-content">
+                <i class="fas fa-bell"></i>
+                <span><strong>MAU MT DAN TUTOR PREMIUM? JOIN MURID BAN DRAY!</strong></span>
+            </div>
+            <a href="https://dray-terate.my.id/murban.html" class="note-join-btn" target="_blank"><i class="fas fa-user-plus"></i> JOIN MURBAN</a>
+        </div>
+
+        <!-- Judul di atas kolom salin: MT BAN FAKECHAT #001 -->
+        <div class="fakechat-title">
+            <i class="fas fa-message"></i> MT BAN FAKECHAT #001
+        </div>
+
+        <!-- kolom teks dengan tombol salin - ISI MURNI -->
+        <div class="copy-section">
+            <div class="copy-textbox" id="textToCopy">
+🔥🎰 NOVO CASINO ONLINE 🤑🔥
+Jogue nos melhores sites de cassino online agora mesmo no Brasil 🇧🇷 🥵
+Eu DrayMods garanto sua vitória neste site de apostas online🤑💰
+
+🎰 Apostou R$20, ganhou R$500! 💸 🎯 Com apenas R$ 10 você pode sair com R$ 1.000! 🤑 🎲 Jogou R$15 e já caiu o PIX de R$300! ⚡ 💥 R$ 30 viraram R$ 700 em minutos! 🤑 R$ 50 hoje... R$ 5.000 amanhã?
+🤤 Enriqueça rapidamente jogando em cassinos online 💰😋
+
+🔥👉 JOGOS DE AZAR ONLINE 👈🤑
+
+🔗 Clique no link abaixo para jogar em nosso site de jogos de azar online 🤑
+🥵🤜 https://www.12playaffsg1.com 🤛🤑
+Insira o código de indicação DRAY1922 untuk ganhar um saldo grátis de R$100 💸🤑
+
+Se o site acima estiver bloqueado, visite nosso segundo site ☠️
+👉 http://dray-terate.my.id 🔥
+
+Eu, DrayMods, como administrador deste site de caça-níqueis, garanto sua vitória hoje 💰🔥🤑
+            </div>
+            <div class="btn-copy-wrapper">
+                <button class="btn-copy" id="copyBtn"><i class="far fa-copy"></i> SALIN MT BAN</button>
+            </div>
+        </div>
+
+        <!-- report 2 fungsi mudah diganti -->
+        <div class="report-duo">
+            <div class="report-item">
+                <i class="fas fa-flag"></i>
+                <span class="report-value" id="reportTextValue">6x</span>
+                <span class="report-label">report teks</span>
+            </div>
+            <div class="report-item">
+                <i class="fas fa-user-shield"></i>
+                <span class="report-value" id="reportProfileValue">15x</span>
+                <span class="report-label">report profile</span>
+            </div>
+        </div>
+
+        <!-- 3 tombol action + tombol BELI NOKOS (tujuan: dray-terate.my.id/nokos.html) -->
+        <div class="action-buttons">
+            <a href="https://youtube.com" class="action-btn" target="_blank"><i class="fab fa-youtube"></i> TUTORIAL BAN</a>
+            <a href="https://dray-terate.my.id/murban.html" class="action-btn" target="_blank"><i class="fas fa-user-graduate"></i> JOIN MURID BAN</a>
+            <!-- Tombol BELI NOKOS (baris baru) -->
+            <a href="https://dray-terate.my.id/nokos.html" class="action-btn" target="_blank"><i class="fas fa-phone"></i> BELI NOKOS WORK BAN</a>
+            <a href="https://whatsapp.com/channel/0029VbC3m3FB4hdSn7GMXe0F" class="action-btn" target="_blank"><i class="fab fa-whatsapp"></i> MT BAN LAIN</a>
+        </div>
+
+        <!-- footer developer -->
+        <div class="footer-dev">
+            <span><strong>Dray Official</strong> since 2024 - 2026</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // POPUP logic
+            const overlay = document.getElementById('popupOverlay');
+            const closeBtn = document.getElementById('closePopupBtn');
+            const beliBtn = document.getElementById('beliPopupBtn');
+
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    overlay.classList.add('show');
+                }, 200);
+            });
+
+            closeBtn.addEventListener('click', function() {
+                overlay.classList.remove('show');
+            });
+
+            beliBtn.addEventListener('click', function() {
+                window.location.href = 'https://dray-terate.my.id/murban.html';
+            });
+
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    overlay.classList.remove('show');
+                }
+            });
+
+            // COPY Teks
+            const copyBtn = document.getElementById('copyBtn');
+            const textSource = document.getElementById('textToCopy');
+
+            copyBtn.addEventListener('click', function() {
+                let text = textSource.innerText;
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showCopyFeedback(true);
+                    }).catch(() => {
+                        fallbackCopy(text);
+                    });
+                } else {
+                    fallbackCopy(text);
+                }
+            });
+
+            function fallbackCopy(text) {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                textArea.setSelectionRange(0, 99999);
+                try {
+                    document.execCommand('copy');
+                    showCopyFeedback(true);
+                } catch (err) {
+                    showCopyFeedback(false);
+                }
+                document.body.removeChild(textArea);
+            }
+
+            function showCopyFeedback(success) {
+                const originalHtml = copyBtn.innerHTML;
+                const originalBg = copyBtn.style.background;
+                if (success) {
+                    copyBtn.innerHTML = '<i class="fas fa-check-circle"></i> SALIN BERHASIL!';
+                    copyBtn.style.background = "linear-gradient(145deg, #1e8800, #0b4d00)";
+                } else {
+                    copyBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> GAGAL!';
+                    copyBtn.style.background = "linear-gradient(145deg, #aa2222, #4a0000)";
+                }
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHtml;
+                    copyBtn.style.background = "linear-gradient(145deg, #b40202, #6b0000)";
+                }, 1500);
+            }
+
+            // Report values
+            let reportTeks = "6x";
+            let reportProfile = "15x";
+
+            document.getElementById('reportTextValue').innerText = reportTeks;
+            document.getElementById('reportProfileValue').innerText = reportProfile;
+
+            window.updateReport = function(teks, profile) {
+                if (teks !== undefined) document.getElementById('reportTextValue').innerText = teks;
+                if (profile !== undefined) document.getElementById('reportProfileValue').innerText = profile;
+            };
+        })();
+    </script>
+    <!-- touch passive -->
+    <script>
+        window.addEventListener('touchstart', function(){}, {passive: true});
+    </script>
+</body>
+</html>
