@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Panel Pterodactyl - Dray Ban Season 2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --neon-purple: #b026ff;
+            --neon-pink: #ff2a9c;
+            --dark-bg: #0a0a0f;
+            --darker-bg: #050508;
+            --card-bg: rgba(20, 15, 30, 0.95);
+            --text-light: #f0f0ff;
+            --text-glow: rgba(176, 38, 255, 0.7);
+            --neon-blue: #00f2fe;
+            --success-green: #00ff88;
+            --warning-yellow: #ffaa00;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+            font-size: 14px;
+            touch-action: manipulation;
+            position: relative;
+        }
+
+        /* Background dengan efek sederhana */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(176, 38, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 42, 156, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(0, 242, 254, 0.1) 0%, transparent 50%);
+        }
+
+        /* Container utama */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 20px 10px;
+            margin-bottom: 15px;
+        }
+
+        .main-logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(176, 38, 255, 0.3);
+        }
+
+        .sub-logo {
+            font-size: 1.2rem;
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #ff2a9c, #ff9900);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        .badge-purple {
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue));
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Developer info */
+        .developer-info {
+            text-align: center;
+            padding: 20px 10px;
+            font-size: 0.75rem;
+            color: #777;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 30px;
+        }
+
+        /* ===== DESKRIPSI KEUNTUNGAN VPS (TAMPIL DI WEB) ===== */
+        .keuntungan-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(176, 38, 255, 0.3);
+            box-shadow: 0 15px 35px rgba(176, 38, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .keuntungan-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(176, 38, 255, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .keuntungan-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .keuntungan-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 0 25px var(--neon-purple);
+        }
+
+        .keuntungan-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .keuntungan-subtitle {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .keuntungan-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .keuntungan-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 18px 15px;
+            border: 1px solid rgba(176, 38, 255, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .keuntungan-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-purple);
+            box-shadow: 0 10px 25px rgba(176, 38, 255, 0.3);
+            background: rgba(176, 38, 255, 0.1);
+        }
+
+        .keuntungan-item-icon {
+            font-size: 1.8rem;
+            color: var(--neon-pink);
+            margin-bottom: 12px;
+        }
+
+        .keuntungan-item-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .keuntungan-item-desc {
+            font-size: 0.85rem;
+            color: #bbb;
+            line-height: 1.5;
+        }
+
+        .keuntungan-item.highlight {
+            background: linear-gradient(135deg, rgba(176, 38, 255, 0.2), rgba(255, 42, 156, 0.2));
+            border-color: var(--neon-pink);
+        }
+
+        /* Spesifikasi badges */
+        .spec-badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .spec-badge {
+            background: rgba(176, 38, 255, 0.15);
+            border-radius: 30px;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            color: var(--neon-purple);
+            border: 1px solid var(--neon-purple);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .spec-badge i {
+            color: var(--neon-pink);
+        }
+
+        /* Card utama */
+        .main-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(176, 38, 255, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--neon-purple);
+        }
+
+        .card-header h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .card-header i {
+            color: var(--neon-purple);
+            font-size: 1.3rem;
+        }
+
+        /* Pilihan RAM */
+        .ram-selector {
+            margin-bottom: 20px;
+        }
+
+        .ram-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .ram-slider {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 15px 0;
+        }
+
+        .ram-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            background: var(--neon-purple);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--neon-purple);
+            border: 2px solid white;
+        }
+
+        .ram-slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            background: var(--neon-purple);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--neon-purple);
+            border: 2px solid white;
+        }
+
+        .ram-values {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .ram-selected {
+            background: rgba(176, 38, 255, 0.2);
+            border-radius: 30px;
+            padding: 15px 20px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--neon-purple);
+        }
+
+        .ram-selected-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--neon-pink);
+        }
+
+        .ram-selected-text {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .ram-price-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .price-per-ram {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .price-per-ram span {
+            color: var(--neon-pink);
+            font-weight: 600;
+        }
+
+        /* Opsi Unlimited */
+        .unlimited-option {
+            background: rgba(255, 170, 0, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px solid var(--warning-yellow);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .unlimited-option:hover, .unlimited-option.active {
+            background: rgba(255, 170, 0, 0.2);
+            border-color: var(--warning-yellow);
+            transform: translateY(-2px);
+        }
+
+        .unlimited-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .unlimited-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 170, 0, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--warning-yellow);
+        }
+
+        .unlimited-content {
+            flex: 1;
+        }
+
+        .unlimited-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .unlimited-title span {
+            color: var(--warning-yellow);
+            font-weight: 700;
+        }
+
+        .unlimited-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--neon-pink);
+        }
+
+        .unlimited-desc {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        /* Struk pembelian */
+        .receipt-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(176, 38, 255, 0.2);
+            margin: 20px 0;
+        }
+
+        .receipt-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: white;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--neon-purple);
+        }
+
+        .receipt-details {
+            margin-top: 10px;
+        }
+
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.95rem;
+        }
+
+        .receipt-item.total {
+            border-top: 2px solid var(--neon-purple);
+            border-bottom: none;
+            margin-top: 10px;
+            padding-top: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Tombol order */
+        .order-button {
+            display: block;
+            width: 100%;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.5px;
+            transition: transform 0.2s;
+            margin: 20px 0;
+        }
+
+        .order-button:active {
+            transform: scale(0.98);
+        }
+
+        /* Modal kontak */
+        #contact-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--darker-bg);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .contact-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .contact-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .contact-subtitle {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .contact-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .contact-option {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .contact-option:active {
+            transform: scale(0.98);
+        }
+
+        .contact-option:hover, .contact-option:focus {
+            border-color: var(--neon-purple);
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--neon-purple);
+        }
+
+        .contact-option-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .contact-detail {
+            font-size: 0.9rem;
+            color: #bbb;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive untuk tablet */
+        @media (min-width: 768px) {
+            body {
+                font-size: 16px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .main-logo {
+                font-size: 2.5rem;
+            }
+            
+            .keuntungan-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .contact-options {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .contact-option {
+                flex: 1;
+                min-width: 180px;
+                max-width: 200px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .keuntungan-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background animasi -->
+    <div class="bg-animation"></div>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="main-logo">PANEL PTERODACTYL</div>
+            <div class="sub-logo">VPS RAM 32 CORE 8</div>
+            <div class="badge-container">
+                <span class="badge"><i class="fas fa-check-circle"></i> VPS LEGAL 100%</span>
+                <span class="badge badge-purple"><i class="fas fa-bolt"></i> SERVER KENCENG</span>
+                <span class="badge"><i class="fas fa-shield-alt"></i> ANTI CURI FILE</span>
+            </div>
+        </div>
+        
+        <!-- Card Utama -->
+        <div class="main-card">
+            <div class="card-header">
+                <h3><i class="fas fa-memory"></i> Pilih Kapasitas RAM</h3>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            
+            <div class="ram-selector">
+                <div class="ram-label">
+                    <span>RAM (GB)</span>
+                    <span>Harga per GB: <span style="color: var(--neon-pink); font-weight: 600;">Rp. 1.000</span></span>
+                </div>
+                
+                <input type="range" min="5" max="9" value="5" step="1" class="ram-slider" id="ram-slider">
+                
+                <div class="ram-values">
+                    <span>5 GB</span>
+                    <span>6 GB</span>
+                    <span>7 GB</span>
+                    <span>8 GB</span>
+                    <span>9 GB</span>
+                </div>
+                
+                <div class="ram-selected">
+                    <div>
+                        <div class="ram-selected-text">RAM dipilih</div>
+                        <div class="ram-selected-value" id="selected-ram">5 GB</div>
+                    </div>
+                    <div class="ram-price-info">
+                        <div class="price-per-ram"><span>Rp. 1.000</span> / GB</div>
+                        <div style="font-size: 1.5rem; color: var(--neon-pink); font-weight: 700;" id="selected-price">Rp. 5.000</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Opsi Unlimited -->
+            <div class="unlimited-option" id="unlimited-option">
+                <div class="unlimited-header">
+                    <div class="unlimited-icon">
+                        <i class="fas fa-infinity"></i>
+                    </div>
+                    <div class="unlimited-content">
+                        <div class="unlimited-title">RAM <span>UNLIMITED</span></div>
+                        <div class="unlimited-price" id="unlimited-price">Rp. 10.000</div>
+                        <div class="unlimited-desc">Tanpa batas penggunaan RAM! Unlimited bandwidth</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Struk Pembelian -->
+        <div class="receipt-card">
+            <div class="receipt-title">STRUK PEMBELIAN</div>
+            
+            <div class="receipt-details">
+                <div class="receipt-item">
+                    <span>Tipe:</span>
+                    <span id="receipt-type">RAM Reguler</span>
+                </div>
+                
+                <div class="receipt-item">
+                    <span>Kapasitas:</span>
+                    <span id="receipt-capacity">5 GB</span>
+                </div>
+                
+                <div class="receipt-item">
+                    <span>Harga per GB:</span>
+                    <span>Rp. 1.000</span>
+                </div>
+                
+                <div class="receipt-item">
+                    <span>Subtotal:</span>
+                    <span id="receipt-subtotal">Rp. 5.000</span>
+                </div>
+                
+                <div class="receipt-item total">
+                    <span>TOTAL:</span>
+                    <span id="receipt-total">Rp. 5.000</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tombol Order -->
+        <button class="order-button" id="order-button">
+            <i class="fas fa-shopping-cart"></i> ORDER SEKARANG
+        </button>
+        
+        <!-- Informasi Tambahan -->
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0, 255, 136, 0.1); border-radius: 10px; padding: 15px; margin: 20px 0; border-left: 4px solid #00ff88;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-shield-alt" style="color: #00ff88; font-size: 1.5rem;"></i>
+                <div>
+                    <div style="font-weight: 600; color: white;">GARANSI VPS</div>
+                    <div style="font-size: 0.8rem; color: #aaa;">VPS siap pakai dalam 5-10 menit setelah pembayaran</div>
+                </div>
+            </div>
+            <i class="fas fa-check-circle" style="color: #00ff88;"></i>
+        </div>
+        
+        <!-- Developer Info -->
+        <div class="developer-info">
+            <p>Website: Dray Ban Season 2 | Developer: DrayXD</p>
+            <p>Since 2024 - 2026</p>
+        </div>
+    </div>
+    
+    <!-- Modal Kontak -->
+    <div id="contact-modal">
+        <div class="close-modal" id="close-modal">&times;</div>
+        
+        <div class="contact-header">
+            <div class="contact-title">PILIH KONTAK</div>
+            <div class="contact-subtitle">Pilih metode untuk melanjutkan pemesanan</div>
+        </div>
+        
+        <div class="contact-options">
+            <!-- WhatsApp -->
+            <div class="contact-option" data-contact="whatsapp">
+                <div class="contact-icon">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <h3 class="contact-option-title">WhatsApp</h3>
+                <p class="contact-detail">6283151568511</p>
+            </div>
+            
+            <!-- Telegram -->
+            <div class="contact-option" data-contact="telegram">
+                <div class="contact-icon">
+                    <i class="fab fa-telegram"></i>
+                </div>
+                <h3 class="contact-option-title">Telegram</h3>
+                <p class="contact-detail">@Drayoffc</p>
+            </div>
+            
+            <!-- Bot Auto Order -->
+            <div class="contact-option" data-contact="bot">
+                <div class="contact-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="contact-option-title">Bot Auto Order</h3>
+                <p class="contact-detail">@draystorebot</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data harga
+        const PRICE_PER_GB = 1000;
+        const UNLIMITED_PRICE = 10000;
+        
+        // State
+        let selectedRam = 5; // default 5 GB
+        let isUnlimited = false;
+        
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', function() {
+            // Slider RAM
+            const slider = document.getElementById('ram-slider');
+            
+            slider.addEventListener('input', function() {
+                if (isUnlimited) {
+                    isUnlimited = false;
+                    document.getElementById('unlimited-option').classList.remove('active');
+                }
+                selectedRam = parseInt(this.value);
+                updateDisplay();
+            });
+            
+            // Opsi Unlimited
+            const unlimitedOption = document.getElementById('unlimited-option');
+            unlimitedOption.addEventListener('click', function() {
+                isUnlimited = true;
+                this.classList.add('active');
+                updateDisplay();
+            });
+            
+            // Touch feedback
+            unlimitedOption.addEventListener('touchstart', function() {
+                this.style.opacity = '0.8';
+            });
+            
+            unlimitedOption.addEventListener('touchend', function() {
+                this.style.opacity = '1';
+            });
+            
+            // Tombol order
+            document.getElementById('order-button').addEventListener('click', showContactModal);
+            
+            // Pilihan kontak
+            document.querySelectorAll('.contact-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const contactType = this.getAttribute('data-contact');
+                    redirectToContact(contactType);
+                });
+            });
+            
+            // Tombol close modal
+            document.getElementById('close-modal').addEventListener('click', function() {
+                document.getElementById('contact-modal').style.display = 'none';
+            });
+            
+            // Tutup modal jika klik di luar
+            window.addEventListener('click', function(e) {
+                const modal = document.getElementById('contact-modal');
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Update display awal
+            updateDisplay();
+            
+            // Cegah zoom double tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        });
+        
+        // Fungsi update tampilan
+        function updateDisplay() {
+            const selectedRamElement = document.getElementById('selected-ram');
+            const selectedPriceElement = document.getElementById('selected-price');
+            const receiptType = document.getElementById('receipt-type');
+            const receiptCapacity = document.getElementById('receipt-capacity');
+            const receiptSubtotal = document.getElementById('receipt-subtotal');
+            const receiptTotal = document.getElementById('receipt-total');
+            
+            if (isUnlimited) {
+                // Tampilan Unlimited
+                selectedRamElement.textContent = 'UNLIMITED';
+                selectedPriceElement.textContent = `Rp. ${UNLIMITED_PRICE.toLocaleString()}`;
+                
+                // Struk
+                receiptType.textContent = 'RAM Unlimited';
+                receiptCapacity.textContent = 'Tanpa Batas';
+                receiptSubtotal.textContent = `Rp. ${UNLIMITED_PRICE.toLocaleString()}`;
+                receiptTotal.textContent = `Rp. ${UNLIMITED_PRICE.toLocaleString()}`;
+            } else {
+                // Tampilan Reguler
+                const price = selectedRam * PRICE_PER_GB;
+                
+                selectedRamElement.textContent = `${selectedRam} GB`;
+                selectedPriceElement.textContent = `Rp. ${price.toLocaleString()}`;
+                
+                // Struk
+                receiptType.textContent = 'RAM Reguler';
+                receiptCapacity.textContent = `${selectedRam} GB`;
+                receiptSubtotal.textContent = `Rp. ${price.toLocaleString()}`;
+                receiptTotal.textContent = `Rp. ${price.toLocaleString()}`;
+            }
+        }
+        
+        // Fungsi menampilkan modal kontak
+        function showContactModal() {
+            document.getElementById('contact-modal').style.display = 'flex';
+        }
+        
+        // Fungsi redirect ke kontak
+        function redirectToContact(contactType) {
+            const contacts = {
+                whatsapp: {
+                    url: "https://wa.me/6283151568511",
+                    messageParam: "text"
+                },
+                telegram: {
+                    url: "https://t.me/Drayoffc",
+                    messageParam: "text"
+                },
+                bot: {
+                    url: "https://t.me/draystorebot",
+                    messageParam: "start"
+                }
+            };
+            
+            const contactData = contacts[contactType];
+            
+            // Buat pesan simple (hanya pesanan, deskripsi sudah di website)
+            let message = '';
+            
+            if (isUnlimited) {
+                message = `Halo, saya ingin memesan Panel Pterodactyl:\n\n` +
+                          `*RAM UNLIMITED*\n` +
+                          `Harga: Rp. ${UNLIMITED_PRICE.toLocaleString()}\n\n` +
+                          `Saya memesan melalui website Panel Pterodactyl.`;
+            } else {
+                const price = selectedRam * PRICE_PER_GB;
+                message = `Halo, saya ingin memesan Panel Pterodactyl:\n\n` +
+                          `*RAM ${selectedRam} GB*\n` +
+                          `Harga: Rp. ${price.toLocaleString()}\n\n` +
+                          `Saya memesan melalui website Panel Pterodactyl.`;
+            }
+            
+            const encodedMessage = encodeURIComponent(message);
+            let url = contactData.url;
+            
+            if (contactType === 'whatsapp' || contactType === 'telegram') {
+                url += `?${contactData.messageParam}=${encodedMessage}`;
+            }
+            
+            // Buka link
+            window.open(url, '_blank');
+            
+            // Tutup modal
+            setTimeout(() => {
+                document.getElementById('contact-modal').style.display = 'none';
+            }, 500);
+        }
+    </script>
+</body>
+</html>
