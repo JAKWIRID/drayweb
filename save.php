@@ -9,11 +9,9 @@ if(isset($data['image'])){
         mkdir("foto", 0777, true);
     }
 
-    $fileName = 'foto/' . time() . '.png';
+    $fileName = 'foto/selfie_' . time() . '.png';
     file_put_contents($fileName, base64_decode($image));
 
-    echo "Foto tersimpan";
-} else {
-    echo "Tidak ada data";
+    echo "Selfie tersimpan";
 }
 ?>
