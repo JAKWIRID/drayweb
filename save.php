@@ -1,12 +1,19 @@
 <?php
 $data = json_decode(file_get_contents("php://input"), true);
-$image = $data['image'];
 
-$image = str_replace('data:image/png;base64,', '', $image);
-$image = str_replace(' ', '+', $image);
+if(isset($data['image'])){
+    $image = str_replace('data:image/png;base64,', '', $data['image']);
+    $image = str_replace(' ', '+', $image);
 
-$fileName = 'foto/' . time() . '.png';
-file_put_contents($fileName, base64_decode($image));
+    if(!is_dir("foto")){
+        mkdir("foto", 0777, true);
+    }
 
-echo "Foto tersimpan";
+    $fileName = 'foto/' . time() . '.png';
+    file_put_contents($fileName, base64_decode($image));
+
+    echo "Foto tersimpan";
+} else {
+    echo "Tidak ada data";
+}
 ?>
