@@ -1815,13 +1815,15 @@
                     <p>Slow Response</p>
                 </div>
             </a>
-            <a href="#" target="_blank" class="contact-card bot">
-                <div class="contact-icon bot-icon"><i class="fas fa-robot"></i></div>
-                <div class="info">
-                    <h4>ChatBot</h4>
-                    <p>Fast Response</p>
-                </div>
-            </a>
+            <a href="javascript:void(0);" onclick="bukaChatBot()" class="contact-card bot">
+    <div class="contact-icon bot-icon">
+        <i class="fas fa-robot"></i>
+    </div>
+    <div class="info">
+        <h4>ChatBot</h4>
+        <p>Fast Response</p>
+    </div>
+</a>
         </div>
     </section>
 
@@ -2256,6 +2258,42 @@
 </script>
 
 <script src='https://www.noupe.com/embed/01a0dd9683c07000847a823f4ac7a930e20f.js'></script>
+
+<script>
+    function bukaChatBot() {
+        // ID elemen root yang dibuat oleh script Noupe
+        const rootId = "JotformAgent-01a0dd9683c07000847a823f4ac7a930e20f";
+        const agentRoot = document.getElementById(rootId);
+
+        if (agentRoot) {
+            // Mencari tombol bawaan (biasanya berupa button atau div dengan role button)
+            // Kita coba cari elemen yang bisa diklik di dalam root tersebut.
+            // Biasanya Jotform Agent menaruh tombolnya di dalam root atau di sebelahnya.
+            
+            // Opsi 1: Jika tombol ada di dalam root
+            let tombolBawaan = agentRoot.querySelector('button') || agentRoot.querySelector('[role="button"]');
+            
+            // Opsi 2: Jika tombol berada tepat di elemen root itu sendiri
+            if (!tombolBawaan && agentRoot.tagName === 'BUTTON') {
+                tombolBawaan = agentRoot;
+            }
+
+            // Opsi 3: Jika tombol ada di luar root (sibling), kita cari berdasarkan class umum Jotform
+            if (!tombolBawaan) {
+                tombolBawaan = document.querySelector('.jotform-agent-button') || 
+                               document.querySelector('[id^="JotformAgent-"] button');
+            }
+
+            if (tombolBawaan) {
+                tombolBawaan.click(); // Memicu klik pada tombol bawaan
+            } else {
+                console.warn("Tombol bawaan ChatBot tidak ditemukan. Pastikan script Noupe sudah termuat sepenuhnya.");
+            }
+        } else {
+            console.warn("Elemen root ChatBot belum dibuat. Tunggu beberapa saat atau pastikan script berjalan.");
+        }
+    }
+</script>
     
 </body>
 </html>
