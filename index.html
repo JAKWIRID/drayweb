@@ -1168,6 +1168,393 @@
             .mindmap-box h4 { font-size: 0.95rem; }
             .mindmap-box p { font-size: 0.8rem; }
         }
+
+ /* ========== MUSIC WIDGET (FLOATING BULAT DRAGGABLE) ========== */
+.music-widget {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9998;
+    width: 60px;
+    height: 60px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.music-toggle {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    color: #fff;
+    font-size: 1.3rem;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 
+        0 0 20px rgba(0, 212, 255, 0.6),
+        0 0 40px rgba(0, 119, 255, 0.3),
+        inset 0 0 15px rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 10;
+}
+
+.music-toggle:hover {
+    transform: scale(1.08);
+    box-shadow: 
+        0 0 30px rgba(0, 212, 255, 0.9),
+        0 0 60px rgba(0, 119, 255, 0.5);
+}
+
+.music-toggle:active { cursor: grabbing; }
+
+.music-toggle.playing {
+    animation: musicPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes musicPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.6), 0 0 40px rgba(0, 119, 255, 0.3); }
+    50% { box-shadow: 0 0 35px rgba(0, 212, 255, 1), 0 0 70px rgba(0, 119, 255, 0.6); }
+}
+
+/* ==== EFEK NADA BERTERBANGAN (HANYA SAAT PLAYING) ==== */
+.music-notes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.music-widget.playing .music-notes {
+    opacity: 1;
+}
+
+.music-notes .note {
+    position: absolute;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    opacity: 0;
+    text-shadow: 
+        0 0 8px rgba(0, 212, 255, 0.9),
+        0 0 15px rgba(0, 119, 255, 0.7);
+    animation: noteFloat 4s ease-out infinite;
+    pointer-events: none;
+}
+
+.music-notes .note:nth-child(1) { animation-delay: 0s;   --tx: -50px; --ty: -80px; }
+.music-notes .note:nth-child(2) { animation-delay: 0.5s; --tx: 45px;  --ty: -70px; }
+.music-notes .note:nth-child(3) { animation-delay: 1s;   --tx: -70px; --ty: -40px; }
+.music-notes .note:nth-child(4) { animation-delay: 1.5s; --tx: 65px;  --ty: -50px; }
+.music-notes .note:nth-child(5) { animation-delay: 2s;   --tx: -40px; --ty: -90px; }
+.music-notes .note:nth-child(6) { animation-delay: 2.5s; --tx: 55px;  --ty: -85px; }
+.music-notes .note:nth-child(7) { animation-delay: 3s;   --tx: -60px; --ty: -60px; }
+.music-notes .note:nth-child(8) { animation-delay: 3.5s; --tx: 75px;  --ty: -35px; }
+
+@keyframes noteFloat {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.6);
+        opacity: 0;
+    }
+}
+
+/* ==== PANEL PLAYLIST ==== */
+.music-panel {
+    position: absolute;
+    bottom: 75px;
+    right: 0;
+    width: 320px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    background: rgba(10, 15, 25, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 212, 255, 0.25);
+    border-radius: 18px;
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.6),
+        0 0 30px rgba(0, 212, 255, 0.15);
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.4s ease,
+                padding 0.4s ease;
+    padding: 0 18px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.music-panel.open {
+    max-height: 600px;
+    opacity: 1;
+    padding: 18px;
+    pointer-events: auto;
+    overflow-y: auto;
+}
+
+.music-panel::-webkit-scrollbar { width: 5px; }
+.music-panel::-webkit-scrollbar-track { background: transparent; }
+.music-panel::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
+
+.music-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.music-header-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1rem;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+}
+
+.music-header-info h4 {
+    font-size: 0.95rem;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+.music-header-info p {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+.music-close {
+    position: absolute;
+    top: 0; right: 0;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.music-close:hover {
+    background: rgba(0, 212, 255, 0.15);
+    color: var(--primary);
+}
+
+/* Now Playing */
+.music-now-playing {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(0, 212, 255, 0.05);
+    border: 1px solid rgba(0, 212, 255, 0.15);
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.music-cover {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+}
+
+.music-cover img { width: 100%; height: 100%; object-fit: cover; }
+
+.music-info h5 {
+    font-size: 0.9rem;
+    color: #fff;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+.music-info p {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+/* Controls */
+.music-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.music-controls button {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-size: 1rem;
+    cursor: pointer;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.music-controls button:hover {
+    background: rgba(0, 212, 255, 0.15);
+    color: var(--primary);
+    transform: scale(1.1);
+}
+
+.music-play-btn {
+    background: linear-gradient(135deg, var(--secondary), var(--primary)) !important;
+    color: #fff !important;
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 1.1rem !important;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+}
+
+.music-play-btn:hover {
+    transform: scale(1.12) !important;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.8) !important;
+}
+
+/* Progress */
+.music-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.music-progress-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+}
+
+.music-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--secondary), var(--primary));
+    border-radius: 10px;
+    box-shadow: 0 0 10px var(--primary);
+    transition: width 0.1s linear;
+}
+
+/* Playlist */
+.music-playlist h6 {
+    font-size: 0.75rem;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    font-family: var(--font-mono);
+}
+
+.music-playlist ul {
+    list-style: none;
+    max-height: 180px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.music-playlist ul::-webkit-scrollbar { width: 4px; }
+.music-playlist ul::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
+
+.music-playlist li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.music-playlist li:hover {
+    background: rgba(0, 212, 255, 0.08);
+    color: #fff;
+    transform: translateX(3px);
+}
+
+.music-playlist li.active {
+    background: rgba(0, 212, 255, 0.12);
+    color: var(--primary);
+    border-left: 3px solid var(--primary);
+}
+
+.music-playlist li i {
+    font-size: 0.75rem;
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.music-playlist li .pl-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .music-widget { bottom: 20px; right: 20px; }
+    .music-toggle { width: 52px; height: 52px; font-size: 1.15rem; }
+    .music-panel {
+        width: calc(100vw - 40px);
+        right: -10px;
+        max-width: 300px;
+    }
+    .music-panel.open { max-height: 70vh; }
+    .music-notes .note { font-size: 12px; }
+}       
     </style>
 </head>
 <body>
@@ -1438,11 +1825,79 @@
         </div>
     </section>
 
+<!-- ========== MUSIC PLAYER FLOATING BUTTON ========== -->
+<div class="music-widget" id="musicWidget">
+    <!-- Efek nada berterbangan (di sekeliling tombol) -->
+    <div class="music-notes" id="musicNotes">
+        <span class="note">♪</span>
+        <span class="note">♫</span>
+        <span class="note">♪</span>
+        <span class="note">♬</span>
+        <span class="note">♩</span>
+        <span class="note">♫</span>
+        <span class="note">♪</span>
+        <span class="note">♬</span>
+    </div>
+
+    <!-- Panel Playlist (muncul saat tombol diklik) -->
+    <div class="music-panel" id="musicPanel">
+        <div class="music-panel-header">
+            <div class="music-header-icon"><i class="fas fa-music"></i></div>
+            <div class="music-header-info">
+                <h4 id="musicHeaderTitle">Playlist Saya</h4>
+                <p id="musicHeaderSub">Pilih lagu favoritmu</p>
+            </div>
+            <button class="music-close" id="musicClose"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="music-now-playing">
+            <div class="music-cover" id="musicCover">
+                <i class="fas fa-music"></i>
+            </div>
+            <div class="music-info">
+                <h5 id="musicTitle">Belum ada lagu</h5>
+                <p id="musicArtist">Pilih dari playlist</p>
+            </div>
+        </div>
+
+        <div class="music-controls">
+            <button id="musicPrev"><i class="fas fa-step-backward"></i></button>
+            <button id="musicPlay" class="music-play-btn"><i class="fas fa-play"></i></button>
+            <button id="musicNext"><i class="fas fa-step-forward"></i></button>
+        </div>
+
+        <div class="music-progress">
+            <span id="musicCurrent">0:00</span>
+            <div class="music-progress-bar" id="musicProgressBar">
+                <div class="music-progress-fill" id="musicProgressFill"></div>
+            </div>
+            <span id="musicDuration">0:00</span>
+        </div>
+
+        <div class="music-playlist">
+            <h6>Playlist</h6>
+            <ul id="musicPlaylist">
+                <!-- Lagu diisi via JavaScript -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Tombol Bulat yang bisa digeser -->
+    <button class="music-toggle" id="musicToggle">
+        <i class="fas fa-music" id="musicIcon"></i>
+    </button>
+
+    <!-- Audio element -->
+    <audio id="musicAudio" preload="metadata"></audio>
+</div>
+    
     <!-- FOOTER -->
     <footer>
         <p>&copy; 2026 Dray Project <i class="fas fa-heart" style="color: var(--primary);"></i></p>
     </footer>
 
+
+    
     <script>
         // ========== LOADING SCREEN ==========
         document.addEventListener('DOMContentLoaded', () => {
@@ -1572,5 +2027,266 @@
             });
         });
     </script>
+<script>
+// ========== MUSIC PLAYER WIDGET ==========
+(function() {
+    'use strict';
+    
+    // 🎵 === DAFTAR LAGU (GANTI SESUAI KEINGINAN ANDA) ===
+    // url: link audio (mp3/ogg), title: judul lagu, artist: nama artis, cover: link gambar (opsional)
+    const playlist = [
+        { 
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', 
+            title: 'Lagu Pertama', 
+            artist: 'Artis A',
+            cover: '' // kosongkan jika tidak ada, atau isi URL gambar
+        },
+        { 
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', 
+            title: 'Lagu Kedua', 
+            artist: 'Artis B',
+            cover: ''
+        },
+        { 
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', 
+            title: 'Lagu Ketiga', 
+            artist: 'Artis C',
+            cover: ''
+        },
+        { 
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', 
+            title: 'Lagu Keempat', 
+            artist: 'Artis D',
+            cover: ''
+        }
+    ];
+    
+    const widget       = document.getElementById('musicWidget');
+    const toggleBtn    = document.getElementById('musicToggle');
+    const panel        = document.getElementById('musicPanel');
+    const closeBtn     = document.getElementById('musicClose');
+    const audio        = document.getElementById('musicAudio');
+    const playBtn      = document.getElementById('musicPlay');
+    const prevBtn      = document.getElementById('musicPrev');
+    const nextBtn      = document.getElementById('musicNext');
+    const titleEl      = document.getElementById('musicTitle');
+    const artistEl     = document.getElementById('musicArtist');
+    const coverEl      = document.getElementById('musicCover');
+    const currentEl    = document.getElementById('musicCurrent');
+    const durationEl   = document.getElementById('musicDuration');
+    const progressBar  = document.getElementById('musicProgressBar');
+    const progressFill = document.getElementById('musicProgressFill');
+    const playlistEl   = document.getElementById('musicPlaylist');
+    
+    let currentIndex = 0;
+    let isPlaying = false;
+    let isDragging = false;
+    let dragOffsetX = 0, dragOffsetY = 0;
+    let hasMoved = false;
+    
+    // ==== FORMAT WAKTU ====
+    function formatTime(sec) {
+        if (isNaN(sec)) return '0:00';
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+    
+    // ==== RENDER PLAYLIST ====
+    function renderPlaylist() {
+        playlistEl.innerHTML = '';
+        playlist.forEach((song, i) => {
+            const li = document.createElement('li');
+            li.dataset.index = i;
+            li.innerHTML = `<i class="fas fa-music"></i><span class="pl-title">${song.title}</span>`;
+            if (i === currentIndex) li.classList.add('active');
+            li.addEventListener('click', () => {
+                loadSong(i);
+                playAudio();
+            });
+            playlistEl.appendChild(li);
+        });
+    }
+    
+    // ==== LOAD LAGU ====
+    function loadSong(index) {
+        const song = playlist[index];
+        if (!song) return;
+        currentIndex = index;
+        audio.src = song.url;
+        titleEl.textContent = song.title;
+        artistEl.textContent = song.artist || 'Unknown Artist';
+        
+        // Cover
+        if (song.cover) {
+            coverEl.innerHTML = `<img src="${song.cover}" alt="${song.title}">`;
+        } else {
+            coverEl.innerHTML = `<i class="fas fa-music"></i>`;
+        }
+        
+        // Highlight playlist
+        document.querySelectorAll('#musicPlaylist li').forEach((li, i) => {
+            li.classList.toggle('active', i === index);
+        });
+        
+        // Update header
+        document.getElementById('musicHeaderSub').textContent = song.title;
+    }
+    
+    // ==== PLAY / PAUSE ====
+    function playAudio() {
+        audio.play().then(() => {
+            isPlaying = true;
+            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            widget.classList.add('playing');
+            toggleBtn.classList.add('playing');
+        }).catch(err => {
+            console.warn('Autoplay ditolak atau error:', err);
+        });
+    }
+    
+    function pauseAudio() {
+        audio.pause();
+        isPlaying = false;
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        widget.classList.remove('playing');
+        toggleBtn.classList.remove('playing');
+    }
+    
+    function togglePlay() {
+        if (isPlaying) pauseAudio();
+        else playAudio();
+    }
+    
+    // ==== NEXT / PREV ====
+    function nextSong() {
+        currentIndex = (currentIndex + 1) % playlist.length;
+        loadSong(currentIndex);
+        playAudio();
+    }
+    
+    function prevSong() {
+        currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+        loadSong(currentIndex);
+        playAudio();
+    }
+    
+    // ==== EVENT LISTENERS ====
+    playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePlay();
+    });
+    nextBtn.addEventListener('click', (e) => { e.stopPropagation(); nextSong(); });
+    prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prevSong(); });
+    
+    audio.addEventListener('timeupdate', () => {
+        if (audio.duration) {
+            const pct = (audio.currentTime / audio.duration) * 100;
+            progressFill.style.width = pct + '%';
+            currentEl.textContent = formatTime(audio.currentTime);
+            durationEl.textContent = formatTime(audio.duration);
+        }
+    });
+    
+    audio.addEventListener('ended', nextSong);
+    
+    audio.addEventListener('loadedmetadata', () => {
+        durationEl.textContent = formatTime(audio.duration);
+    });
+    
+    // Progress bar click
+    progressBar.addEventListener('click', (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const pct = (e.clientX - rect.left) / rect.width;
+        if (audio.duration) audio.currentTime = pct * audio.duration;
+    });
+    
+    // Close panel
+    closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        panel.classList.remove('open');
+    });
+    
+    // ==== DRAGGABLE BUTTON ====
+    const widgetRect = () => widget.getBoundingClientRect();
+    
+    function startDrag(clientX, clientY) {
+        const rect = widgetRect();
+        dragOffsetX = clientX - rect.left;
+        dragOffsetY = clientY - rect.top;
+        isDragging = true;
+        hasMoved = false;
+        widget.style.transition = 'none';
+        widget.style.bottom = 'auto';
+        widget.style.right = 'auto';
+        widget.style.left = rect.left + 'px';
+        widget.style.top = rect.top + 'px';
+    }
+    
+    function moveDrag(clientX, clientY) {
+        if (!isDragging) return;
+        hasMoved = true;
+        let x = clientX - dragOffsetX;
+        let y = clientY - dragOffsetY;
+        
+        // Batasi agar tidak keluar layar
+        const maxX = window.innerWidth - widget.offsetWidth;
+        const maxY = window.innerHeight - widget.offsetHeight;
+        x = Math.max(0, Math.min(x, maxX));
+        y = Math.max(0, Math.min(y, maxY));
+        
+        widget.style.left = x + 'px';
+        widget.style.top = y + 'px';
+    }
+    
+    function endDrag() {
+        if (!isDragging) return;
+        isDragging = false;
+        widget.style.transition = 'transform 0.3s ease';
+        
+        // Jika tidak bergerak jauh, anggap klik (toggle panel)
+        if (!hasMoved) {
+            panel.classList.toggle('open');
+        }
+    }
+    
+    // Mouse events
+    toggleBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        startDrag(e.clientX, e.clientY);
+    });
+    document.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
+    document.addEventListener('mouseup', endDrag);
+    
+    // Touch events
+    toggleBtn.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        startDrag(touch.clientX, touch.clientY);
+    }, { passive: true });
+    
+    document.addEventListener('touchmove', (e) => {
+        if (isDragging) {
+            const touch = e.touches[0];
+            moveDrag(touch.clientX, touch.clientY);
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    document.addEventListener('touchend', endDrag);
+    
+    // Klik di luar panel menutup panel
+    document.addEventListener('click', (e) => {
+        if (!widget.contains(e.target) && panel.classList.contains('open')) {
+            panel.classList.remove('open');
+        }
+    });
+    
+    // ==== INIT ====
+    renderPlaylist();
+    loadSong(0);
+    
+})();
+</script>
+    
 </body>
 </html>
