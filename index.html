@@ -2027,58 +2027,7 @@
             });
         });
     </script>
-<script>
-// ========== MUSIC PLAYER WIDGET ==========
-(function() {
-    'use strict';
-    
-    // 🎵 === DAFTAR LAGU (GANTI SESUAI KEINGINAN ANDA) ===
-    // url: link audio (mp3/ogg), title: judul lagu, artist: nama artis, cover: link gambar (opsional)
-    const playlist = [
-        { 
-            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', 
-            title: 'Lagu Pertama', 
-            artist: 'Artis A',
-            cover: '' // kosongkan jika tidak ada, atau isi URL gambar
-        },
-        { 
-            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', 
-            title: 'Lagu Kedua', 
-            artist: 'Artis B',
-            cover: ''
-        },
-        { 
-            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', 
-            title: 'Lagu Ketiga', 
-            artist: 'Artis C',
-            cover: ''
-        },
-        { 
-            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', 
-            title: 'Lagu Keempat', 
-            artist: 'Artis D',
-            cover: ''
-        }
-    ];
-    
-    const widget       = document.getElementById('musicWidget');
-    const toggleBtn    = document.getElementById('musicToggle');
-    const panel        = document.getElementById('musicPanel');
-    const closeBtn     = document.getElementById('musicClose');
-    const audio        = document.getElementById('musicAudio');
-    const playBtn      = document.getElementById('musicPlay');
-    const prevBtn      = document.getElementById('musicPrev');
-    const nextBtn      = document.getElementById('musicNext');
-    const titleEl      = document.getElementById('musicTitle');
-    const artistEl     = document.getElementById('musicArtist');
-    const coverEl      = document.getElementById('musicCover');
-    const currentEl    = document.getElementById('musicCurrent');
-    const durationEl   = document.getElementById('musicDuration');
-    const progressBar  = document.getElementById('musicProgressBar');
-    const progressFill = document.getElementById('musicProgressFill');
-    const playlistEl   = document.getElementById('musicPlaylist');
-    
-    let currentIndex = 0;
+
     let isPlaying = false;
     let isDragging = false;
     let dragOffsetX = 0, dragOffsetY = 0;
@@ -2226,98 +2175,279 @@ function onPointerDown(clientX, clientY) {
     const pos = getWidgetPos();
     widgetStartX = pos.left;
     widgetStartY = pos.top;
-    widget.style.transition = 'none';
-    widget.style.bottom = 'auto';
-    widget.style.right = 'auto';
-    widget.style.left = widgetStartX + 'px';
-    widget.style.top = widgetStartY + 'px';
-}
-
-function onPointerMove(clientX, clientY) {
-    if (!pointerDown) return;
+<script>
+// ========== MUSIC PLAYER WIDGET ==========
+(function() {
+    'use strict';
     
-    const dx = clientX - dragStartX;
-    const dy = clientY - dragStartY;
+    // 🎵 === DAFTAR LAGU (GANTI SESUAI KEINGINAN ANDA) ===
+    const playlist = [
+        { 
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', 
+            title: 'Lagu Pertama', 
+            artist: 'Artis A',
+            cover: ''
+        },
+        { 
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', 
+            title: 'Lagu Kedua', 
+            artist: 'Artis B',
+            cover: ''
+        },
+        { 
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', 
+            title: 'Lagu Ketiga', 
+            artist: 'Artis C',
+            cover: ''
+        },
+        { 
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', 
+            title: 'Lagu Keempat', 
+            artist: 'Artis D',
+            cover: ''
+        }
+    ];
     
-    // Cek apakah sudah melewati threshold
-    if (!hasMoved && Math.hypot(dx, dy) > DRAG_THRESHOLD) {
-        hasMoved = true;
+    const widget       = document.getElementById('musicWidget');
+    const toggleBtn    = document.getElementById('musicToggle');
+    const panel        = document.getElementById('musicPanel');
+    const closeBtn     = document.getElementById('musicClose');
+    const audio        = document.getElementById('musicAudio');
+    const playBtn      = document.getElementById('musicPlay');
+    const prevBtn      = document.getElementById('musicPrev');
+    const nextBtn      = document.getElementById('musicNext');
+    const titleEl      = document.getElementById('musicTitle');
+    const artistEl     = document.getElementById('musicArtist');
+    const coverEl      = document.getElementById('musicCover');
+    const currentEl    = document.getElementById('musicCurrent');
+    const durationEl   = document.getElementById('musicDuration');
+    const progressBar  = document.getElementById('musicProgressBar');
+    const progressFill = document.getElementById('musicProgressFill');
+    const playlistEl   = document.getElementById('musicPlaylist');
+    
+    let currentIndex = 0;
+    let isPlaying = false;
+    let hasMoved = false;
+    
+    // ==== FORMAT WAKTU ====
+    function formatTime(sec) {
+        if (isNaN(sec)) return '0:00';
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
     }
     
-    if (!hasMoved) return;
-    
-    let newX = widgetStartX + dx;
-    let newY = widgetStartY + dy;
-    
-    // Batasi agar tidak keluar layar
-    const maxX = window.innerWidth - widget.offsetWidth;
-    const maxY = window.innerHeight - widget.offsetHeight;
-    newX = Math.max(0, Math.min(newX, maxX));
-    newY = Math.max(0, Math.min(newY, maxY));
-    
-    widget.style.left = newX + 'px';
-    widget.style.top = newY + 'px';
-}
-
-function onPointerUp() {
-    if (!pointerDown) return;
-    pointerDown = false;
-    
-    widget.style.transition = 'transform 0.3s ease';
-    
-    // Jika tidak bergerak (dianggap klik), toggle panel
-    if (!hasMoved) {
-        panel.classList.toggle('open');
+    // ==== RENDER PLAYLIST ====
+    function renderPlaylist() {
+        playlistEl.innerHTML = '';
+        playlist.forEach((song, i) => {
+            const li = document.createElement('li');
+            li.dataset.index = i;
+            li.innerHTML = `<i class="fas fa-music"></i><span class="pl-title">${song.title}</span>`;
+            if (i === currentIndex) li.classList.add('active');
+            li.addEventListener('click', () => {
+                loadSong(i);
+                playAudio();
+            });
+            playlistEl.appendChild(li);
+        });
     }
     
-    // Reset hasMoved setelah delay kecil agar tidak bentrok dengan event click global
-    setTimeout(() => { hasMoved = false; }, 50);
-}
-
-// Mouse events
-toggleBtn.addEventListener('mousedown', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onPointerDown(e.clientX, e.clientY);
-});
-
-document.addEventListener('mousemove', (e) => {
-    if (pointerDown) onPointerMove(e.clientX, e.clientY);
-});
-
-document.addEventListener('mouseup', (e) => {
-    if (pointerDown) onPointerUp();
-});
-
-// Touch events
-toggleBtn.addEventListener('touchstart', (e) => {
-    const t = e.touches[0];
-    onPointerDown(t.clientX, t.clientY);
-}, { passive: true });
-
-document.addEventListener('touchmove', (e) => {
-    if (pointerDown) {
-        const t = e.touches[0];
-        onPointerMove(t.clientX, t.clientY);
-        if (hasMoved) e.preventDefault();
+    // ==== LOAD LAGU ====
+    function loadSong(index) {
+        const song = playlist[index];
+        if (!song) return;
+        currentIndex = index;
+        audio.src = song.url;
+        titleEl.textContent = song.title;
+        artistEl.textContent = song.artist || 'Unknown Artist';
+        
+        if (song.cover) {
+            coverEl.innerHTML = `<img src="${song.cover}" alt="${song.title}">`;
+        } else {
+            coverEl.innerHTML = `<i class="fas fa-music"></i>`;
+        }
+        
+        document.querySelectorAll('#musicPlaylist li').forEach((li, i) => {
+            li.classList.toggle('active', i === index);
+        });
+        
+        document.getElementById('musicHeaderSub').textContent = song.title;
     }
-}, { passive: false });
-
-document.addEventListener('touchend', (e) => {
-    if (pointerDown) onPointerUp();
-});
-
-// Klik di luar panel menutup panel (JANGAN ganggu klik tombol toggle)
-document.addEventListener('click', (e) => {
-    // Jika klik di dalam widget (tombol atau panel), jangan tutup
-    if (widget.contains(e.target)) return;
-    // Jika panel terbuka dan klik di luar, tutup
-    if (panel.classList.contains('open')) {
+    
+    // ==== PLAY / PAUSE ====
+    function playAudio() {
+        audio.play().then(() => {
+            isPlaying = true;
+            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            widget.classList.add('playing');
+            toggleBtn.classList.add('playing');
+        }).catch(err => {
+            console.warn('Autoplay ditolak atau error:', err);
+        });
+    }
+    
+    function pauseAudio() {
+        audio.pause();
+        isPlaying = false;
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        widget.classList.remove('playing');
+        toggleBtn.classList.remove('playing');
+    }
+    
+    function togglePlay() {
+        if (isPlaying) pauseAudio();
+        else playAudio();
+    }
+    
+    // ==== NEXT / PREV ====
+    function nextSong() {
+        currentIndex = (currentIndex + 1) % playlist.length;
+        loadSong(currentIndex);
+        playAudio();
+    }
+    
+    function prevSong() {
+        currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+        loadSong(currentIndex);
+        playAudio();
+    }
+    
+    // ==== EVENT LISTENERS (Kontrol Musik) ====
+    playBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
+    nextBtn.addEventListener('click', (e) => { e.stopPropagation(); nextSong(); });
+    prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prevSong(); });
+    
+    audio.addEventListener('timeupdate', () => {
+        if (audio.duration) {
+            const pct = (audio.currentTime / audio.duration) * 100;
+            progressFill.style.width = pct + '%';
+            currentEl.textContent = formatTime(audio.currentTime);
+            durationEl.textContent = formatTime(audio.duration);
+        }
+    });
+    
+    audio.addEventListener('ended', nextSong);
+    audio.addEventListener('loadedmetadata', () => {
+        durationEl.textContent = formatTime(audio.duration);
+    });
+    
+    progressBar.addEventListener('click', (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const pct = (e.clientX - rect.left) / rect.width;
+        if (audio.duration) audio.currentTime = pct * audio.duration;
+    });
+    
+    closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         panel.classList.remove('open');
+    });
+    
+    // ==== DRAGGABLE BUTTON + CLICK DETECTION ====
+    let dragStartX = 0, dragStartY = 0;
+    let widgetStartX = 0, widgetStartY = 0;
+    let pointerDown = false;
+    const DRAG_THRESHOLD = 5;
+    
+    function getWidgetPos() {
+        const rect = widget.getBoundingClientRect();
+        return { left: rect.left, top: rect.top };
     }
-});
-
-    // ==== INIT ====
+    
+    function onPointerDown(clientX, clientY) {
+        pointerDown = true;
+        hasMoved = false;
+        dragStartX = clientX;
+        dragStartY = clientY;
+        const pos = getWidgetPos();
+        widgetStartX = pos.left;
+        widgetStartY = pos.top;
+        widget.style.transition = 'none';
+        widget.style.bottom = 'auto';
+        widget.style.right = 'auto';
+        widget.style.left = widgetStartX + 'px';
+        widget.style.top = widgetStartY + 'px';
+    }
+    
+    function onPointerMove(clientX, clientY) {
+        if (!pointerDown) return;
+        
+        const dx = clientX - dragStartX;
+        const dy = clientY - dragStartY;
+        
+        if (!hasMoved && Math.hypot(dx, dy) > DRAG_THRESHOLD) {
+            hasMoved = true;
+        }
+        
+        if (!hasMoved) return;
+        
+        let newX = widgetStartX + dx;
+        let newY = widgetStartY + dy;
+        
+        const maxX = window.innerWidth - widget.offsetWidth;
+        const maxY = window.innerHeight - widget.offsetHeight;
+        newX = Math.max(0, Math.min(newX, maxX));
+        newY = Math.max(0, Math.min(newY, maxY));
+        
+        widget.style.left = newX + 'px';
+        widget.style.top = newY + 'px';
+    }
+    
+    function onPointerUp() {
+        if (!pointerDown) return;
+        pointerDown = false;
+        
+        widget.style.transition = 'transform 0.3s ease';
+        
+        if (!hasMoved) {
+            panel.classList.toggle('open');
+        }
+        
+        setTimeout(() => { hasMoved = false; }, 50);
+    }
+    
+    // Mouse events
+    toggleBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onPointerDown(e.clientX, e.clientY);
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (pointerDown) onPointerMove(e.clientX, e.clientY);
+    });
+    
+    document.addEventListener('mouseup', () => {
+        if (pointerDown) onPointerUp();
+    });
+    
+    // Touch events
+    toggleBtn.addEventListener('touchstart', (e) => {
+        const t = e.touches[0];
+        onPointerDown(t.clientX, t.clientY);
+    }, { passive: true });
+    
+    document.addEventListener('touchmove', (e) => {
+        if (pointerDown) {
+            const t = e.touches[0];
+            onPointerMove(t.clientX, t.clientY);
+            if (hasMoved) e.preventDefault();
+        }
+    }, { passive: false });
+    
+    document.addEventListener('touchend', () => {
+        if (pointerDown) onPointerUp();
+    });
+    
+    // Klik di luar panel menutup panel
+    document.addEventListener('click', (e) => {
+        if (widget.contains(e.target)) return;
+        if (panel.classList.contains('open')) {
+            panel.classList.remove('open');
+        }
+    });
+    
+    // ==== INIT (JANGAN DIHAPUS!) ====
     renderPlaylist();
     loadSong(0);
     
