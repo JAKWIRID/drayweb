@@ -2207,80 +2207,116 @@
         panel.classList.remove('open');
     });
     
-    // ==== DRAGGABLE BUTTON ====
-    const widgetRect = () => widget.getBoundingClientRect();
+    // ==== DRAGGABLE BUTTON + CLICK DETECTION ====
+let dragStartX = 0, dragStartY = 0;
+let widgetStartX = 0, widgetStartY = 0;
+let pointerDown = false;
+const DRAG_THRESHOLD = 5; // px, jika gerakan < 5px dianggap klik
+
+function getWidgetPos() {
+    const rect = widget.getBoundingClientRect();
+    return { left: rect.left, top: rect.top };
+}
+
+function onPointerDown(clientX, clientY) {
+    pointerDown = true;
+    hasMoved = false;
+    dragStartX = clientX;
+    dragStartY = clientY;
+    const pos = getWidgetPos();
+    widgetStartX = pos.left;
+    widgetStartY = pos.top;
+    widget.style.transition = 'none';
+    widget.style.bottom = 'auto';
+    widget.style.right = 'auto';
+    widget.style.left = widgetStartX + 'px';
+    widget.style.top = widgetStartY + 'px';
+}
+
+function onPointerMove(clientX, clientY) {
+    if (!pointerDown) return;
     
-    function startDrag(clientX, clientY) {
-        const rect = widgetRect();
-        dragOffsetX = clientX - rect.left;
-        dragOffsetY = clientY - rect.top;
-        isDragging = true;
-        hasMoved = false;
-        widget.style.transition = 'none';
-        widget.style.bottom = 'auto';
-        widget.style.right = 'auto';
-        widget.style.left = rect.left + 'px';
-        widget.style.top = rect.top + 'px';
-    }
+    const dx = clientX - dragStartX;
+    const dy = clientY - dragStartY;
     
-    function moveDrag(clientX, clientY) {
-        if (!isDragging) return;
+    // Cek apakah sudah melewati threshold
+    if (!hasMoved && Math.hypot(dx, dy) > DRAG_THRESHOLD) {
         hasMoved = true;
-        let x = clientX - dragOffsetX;
-        let y = clientY - dragOffsetY;
-        
-        // Batasi agar tidak keluar layar
-        const maxX = window.innerWidth - widget.offsetWidth;
-        const maxY = window.innerHeight - widget.offsetHeight;
-        x = Math.max(0, Math.min(x, maxX));
-        y = Math.max(0, Math.min(y, maxY));
-        
-        widget.style.left = x + 'px';
-        widget.style.top = y + 'px';
     }
     
-    function endDrag() {
-        if (!isDragging) return;
-        isDragging = false;
-        widget.style.transition = 'transform 0.3s ease';
-        
-        // Jika tidak bergerak jauh, anggap klik (toggle panel)
-        if (!hasMoved) {
-            panel.classList.toggle('open');
-        }
+    if (!hasMoved) return;
+    
+    let newX = widgetStartX + dx;
+    let newY = widgetStartY + dy;
+    
+    // Batasi agar tidak keluar layar
+    const maxX = window.innerWidth - widget.offsetWidth;
+    const maxY = window.innerHeight - widget.offsetHeight;
+    newX = Math.max(0, Math.min(newX, maxX));
+    newY = Math.max(0, Math.min(newY, maxY));
+    
+    widget.style.left = newX + 'px';
+    widget.style.top = newY + 'px';
+}
+
+function onPointerUp() {
+    if (!pointerDown) return;
+    pointerDown = false;
+    
+    widget.style.transition = 'transform 0.3s ease';
+    
+    // Jika tidak bergerak (dianggap klik), toggle panel
+    if (!hasMoved) {
+        panel.classList.toggle('open');
     }
     
-    // Mouse events
-    toggleBtn.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        startDrag(e.clientX, e.clientY);
-    });
-    document.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
-    document.addEventListener('mouseup', endDrag);
-    
-    // Touch events
-    toggleBtn.addEventListener('touchstart', (e) => {
-        const touch = e.touches[0];
-        startDrag(touch.clientX, touch.clientY);
-    }, { passive: true });
-    
-    document.addEventListener('touchmove', (e) => {
-        if (isDragging) {
-            const touch = e.touches[0];
-            moveDrag(touch.clientX, touch.clientY);
-            e.preventDefault();
-        }
-    }, { passive: false });
-    
-    document.addEventListener('touchend', endDrag);
-    
-    // Klik di luar panel menutup panel
-    document.addEventListener('click', (e) => {
-        if (!widget.contains(e.target) && panel.classList.contains('open')) {
-            panel.classList.remove('open');
-        }
-    });
-    
+    // Reset hasMoved setelah delay kecil agar tidak bentrok dengan event click global
+    setTimeout(() => { hasMoved = false; }, 50);
+}
+
+// Mouse events
+toggleBtn.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onPointerDown(e.clientX, e.clientY);
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (pointerDown) onPointerMove(e.clientX, e.clientY);
+});
+
+document.addEventListener('mouseup', (e) => {
+    if (pointerDown) onPointerUp();
+});
+
+// Touch events
+toggleBtn.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    onPointerDown(t.clientX, t.clientY);
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+    if (pointerDown) {
+        const t = e.touches[0];
+        onPointerMove(t.clientX, t.clientY);
+        if (hasMoved) e.preventDefault();
+    }
+}, { passive: false });
+
+document.addEventListener('touchend', (e) => {
+    if (pointerDown) onPointerUp();
+});
+
+// Klik di luar panel menutup panel (JANGAN ganggu klik tombol toggle)
+document.addEventListener('click', (e) => {
+    // Jika klik di dalam widget (tombol atau panel), jangan tutup
+    if (widget.contains(e.target)) return;
+    // Jika panel terbuka dan klik di luar, tutup
+    if (panel.classList.contains('open')) {
+        panel.classList.remove('open');
+    }
+});
+
     // ==== INIT ====
     renderPlaylist();
     loadSong(0);
